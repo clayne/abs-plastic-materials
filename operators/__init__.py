@@ -16,4 +16,5 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .append_materials import *
+from .export_node_groups import *
 from .mark_outdated import *

@@ -30,6 +30,7 @@ from .. import addon_updater_ops
 classes = (
     # abs_plastic_materials/operators
     ABS_OT_append_materials,
+    ABS_OT_export_node_groups,
     ABS_OT_mark_outdated,
     # abs_plastic_materials/lib
     ABSPlasticMaterialsPreferences,
@@ -39,4 +40,5 @@ classes = (
     PROPERTIES_PT_abs_plastic_materials,
     PROPERTIES_PT_abs_plastic_materials_properties,
     PROPERTIES_PT_abs_plastic_materials_texture_mapping,
+    PROPERTIES_PT_abs_plastic_materials_dev_tools,
 )

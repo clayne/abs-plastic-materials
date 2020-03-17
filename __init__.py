@@ -18,14 +18,18 @@
 bl_info = {
     "name"        : "ABS Plastic Materials",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
-    "version"     : (2, 2, 0),
+    "version"     : (2, 3, 0),
     "blender"     : (2, 80, 0),
     "description" : "Append ABS Plastic Materials to current blender file with a simple click",
     "location"    : "PROPERTIES > Materials > ABS Plastic Materials",
     "warning"     : "",  # used for warning icon and text in addons panel
     "wiki_url"    : "https://www.blendermarket.com/products/abs-plastic-materials",
+    "doc_url"     : "https://www.blendermarket.com/products/abs-plastic-materials",  # 2.83+
     "tracker_url" : "https://github.com/bblanimation/abs-plastic-materials/issues",
     "category"    : "Materials"}
+
+developer_mode = 1  # NOTE: Set to 0 for release, 1 for exposed dictionary
+# NOTE: Remove beta warning from bl_info
 
 # System imports
 # NONE!
@@ -52,6 +56,7 @@ def register():
     bpy.props.abs_plastic_materials_module_name = __name__
     bpy.props.abs_plastic_version = str(bl_info["version"])[1:-1].replace(", ", ".")
     bpy.props.abs_mat_properties = mat_properties
+    bpy.props.abs_developer_mode = developer_mode
 
     bpy.props.abs_mats_common = [
         "ABS Plastic Black",

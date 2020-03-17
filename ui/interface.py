@@ -120,3 +120,26 @@ class PROPERTIES_PT_abs_plastic_materials_texture_mapping(Panel):
         col.prop(scn, "abs_displace")
         col.prop(scn, "abs_uv_scale", text="Scale")
         col.prop(scn, "uv_detail_quality", text="Quality")
+
+
+class PROPERTIES_PT_abs_plastic_materials_dev_tools(Panel):
+    bl_space_type  = 'PROPERTIES'
+    bl_region_type = 'WINDOW'
+    bl_context     = "material"
+    bl_label       = "Dev Tools" if b280() else "Dev Tools"
+    bl_parent_id   = "PROPERTIES_PT_abs_plastic_materials"
+    bl_idname      = "PROPERTIES_PT_abs_plastic_materials_dev_tools"
+    # bl_category    = "ABS Plastic Materials"
+    bl_options     = {"DEFAULT_CLOSED"}
+    COMPAT_ENGINES = {"CYCLES", "BLENDER_EEVEE"}
+
+    @classmethod
+    def poll(cls, context):
+        """ ensures operator can execute (if not, returns false) """
+        return bpy.props.abs_developer_mode != 0
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+
+        layout.operator("abs.export_node_groups", icon="EXPORT")
