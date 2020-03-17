@@ -129,7 +129,7 @@ class ABS_OT_append_materials(Operator):
             if b280():
                 n_displace = nodes.new("ShaderNodeDisplacement")
                 n_displace.inputs["Midlevel"].default_value = 0.0
-                n_displace.inputs["Scale"].default_value = 0.001
+                n_displace.inputs["Scale"].default_value = 0.01
             n_tex = nodes.new("ShaderNodeTexCoord")
             n_obj_info = nodes.new("ShaderNodeObjectInfo")
             n_translate = nodes.new("ShaderNodeGroup")
