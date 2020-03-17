@@ -143,7 +143,7 @@ def register():
         default=0.25)
     Scene.abs_displace = FloatProperty(
         name="Displacement",
-        description="Bumpiness of the ABS Plastic Materials (mesh must be unwrapped; 0.002 recommended)",
+        description="Bumpiness of the ABS Plastic Materials (mesh must be unwrapped; 0.04 recommended)",
         subtype="FACTOR",
         min=0, soft_max=1,
         precision=3,

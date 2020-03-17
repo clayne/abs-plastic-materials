@@ -47,6 +47,7 @@ class ABS_OT_append_materials(Operator):
         failed = []
         orig_selection = list(bpy.context.selected_objects)
         outdated_version = len(already_imported) > 0 and bpy.data.materials[already_imported[0]].abs_plastic_version != bpy.props.abs_plastic_version
+        force_reload = self.event and self.event.ctrl
 
         # switch to cycles render engine temporarily
         last_render_engine = scn.render.engine
@@ -68,15 +69,8 @@ class ABS_OT_append_materials(Operator):
                 if cm.material_type == "Random":
                     cm.brick_materials_are_dirty = True
 
-        if len(already_imported) == 0 or outdated_version:
-            # remove existing node groups
-            for ng_name in node_groups_to_replace:
-                ng = bpy.data.node_groups.get(ng_name)
-                if ng is not None: bpy.data.node_groups.remove(ng)
-            # load node groups from 'node_groups_2-??.blend'
-            with bpy.data.libraries.load(blend_file) as (data_from, data_to):
-                for attr in ("node_groups",):
-                    setattr(data_to, attr, getattr(data_from, attr))
+        if len(already_imported) == 0 or outdated_version or force_reload:
+            load_from_library(blend_file, "node_groups", overwrite_data=True)
             bpy.data.node_groups["ABS_Transparent"].use_fake_user = True
             # remove existing bump/specular maps
             for im_name in images_to_replace:
@@ -98,7 +92,7 @@ class ABS_OT_append_materials(Operator):
             # if material exists, remove or skip
             m = bpy.data.materials.get(mat_name)
             if m is not None:
-                if not m.abs_plastic_version != bpy.props.abs_plastic_version:
+                if m.abs_plastic_version == bpy.props.abs_plastic_version and not force_reload:
                     continue
                 # mark material to replace
                 m.name = m.name + "__replaced"
@@ -135,7 +129,7 @@ class ABS_OT_append_materials(Operator):
             if b280():
                 n_displace = nodes.new("ShaderNodeDisplacement")
                 n_displace.inputs["Midlevel"].default_value = 0.0
-                n_displace.inputs["Scale"].default_value = 0.1
+                n_displace.inputs["Scale"].default_value = 0.001
             n_tex = nodes.new("ShaderNodeTexCoord")
             n_obj_info = nodes.new("ShaderNodeObjectInfo")
             n_translate = nodes.new("ShaderNodeGroup")
@@ -236,3 +230,10 @@ class ABS_OT_append_materials(Operator):
         scn.render.engine = last_render_engine
 
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        self.event = event
+        return self.execute(context)
+
+    def __init__(self):
+        self.event = None
