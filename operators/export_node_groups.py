@@ -48,9 +48,12 @@ class ABS_OT_export_node_groups(Operator):
             data_blocks.append(bpy.data.node_groups.get(group_name))
 
         blendlib_name = "node_groups_2-8.blend" if b280() else "node_groups_2-7.blend"
+        storage_path = os.path.join(get_addon_directory(), "lib", blendlib_name)
 
-        storagePath = os.path.join("/", "Users", "cgear13", "scripts", "my_scripts", "abs-plastic-materials", "lib", blendlib_name)
+        assert None not in data_blocks
 
-        bpy.data.libraries.write(storagePath, set(data_blocks), fake_user=True)
+        bpy.data.libraries.write(storage_path, set(data_blocks), fake_user=True)
+
+        self.report({"INFO"}, "Exported successfully!")
 
         return {"FINISHED"}

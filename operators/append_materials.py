@@ -131,7 +131,10 @@ class ABS_OT_append_materials(Operator):
                 n_displace.inputs["Midlevel"].default_value = 0.0
                 n_displace.inputs["Scale"].default_value = 0.01
             n_tex = nodes.new("ShaderNodeTexCoord")
-            n_obj_info = nodes.new("ShaderNodeObjectInfo")
+            n_geometry = nodes.new("ShaderNodeNewGeometry")
+            for output in n_geometry.outputs:
+                if output.name != "Random Per Island":
+                    output.hide = True
             n_translate = nodes.new("ShaderNodeGroup")
             n_translate.node_tree = bpy.data.node_groups.get("ABS_Translate")
             n_translate.name = "ABS_Translate"
@@ -146,8 +149,8 @@ class ABS_OT_append_materials(Operator):
             # else:
             #     links.new(n_bump.outputs["Color"], n_output.inputs["Displacement"])
             links.new(n_tex.outputs[scn.abs_mapping], n_translate.inputs["Vector"])
-            links.new(n_obj_info.outputs["Random"], n_translate.inputs["X"])
-            links.new(n_obj_info.outputs["Random"], n_translate.inputs["Y"])
+            links.new(n_geometry.outputs["Random Per Island"], n_translate.inputs["X"])
+            links.new(n_geometry.outputs["Random Per Island"], n_translate.inputs["Y"])
             links.new(n_translate.outputs["Vector"], n_scale.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_shader.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_bump.inputs["Vector"])
@@ -160,7 +163,7 @@ class ABS_OT_append_materials(Operator):
                 n_displace.location = n_output.location - Vector((000, 200))
             n_scale.location = n_output.location - Vector((400, 200))
             n_translate.location = n_output.location - Vector((600, 200))
-            n_obj_info.location = n_output.location - Vector((775, 50))
+            n_geometry.location = n_output.location - Vector((800, 125))
             n_tex.location = n_output.location - Vector((800, 200))
 
             # set properties
@@ -214,7 +217,9 @@ class ABS_OT_append_materials(Operator):
         #         groups[-1].name = groupName
 
         # report status
-        if len(already_imported) == len(mat_names) and not outdated_version:
+        if force_reload:
+            self.report({"INFO"}, "Materials reloaded successfully!")
+        elif len(already_imported) == len(mat_names) and not outdated_version:
             self.report({"INFO"}, "Materials already imported")
         elif len(already_imported) > 0 and not outdated_version:
             self.report({"INFO"}, "The following Materials were skipped: " + str(already_imported)[1:-1].replace("'", "").replace("ABS Plastic ", ""))
