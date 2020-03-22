@@ -19,7 +19,7 @@ bl_info = {
     "name"        : "ABS Plastic Materials",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
     "version"     : (2, 3, 0),
-    "blender"     : (2, 80, 0),
+    "blender"     : (2, 83, 0),
     "description" : "Append ABS Plastic Materials to current blender file with a simple click",
     "location"    : "PROPERTIES > Materials > ABS Plastic Materials",
     "warning"     : "",  # used for warning icon and text in addons panel
@@ -143,7 +143,7 @@ def register():
     )
     Scene.abs_fingerprints = FloatProperty(
         name="Fingerprints",
-        description="Amount of fingerprints and dust to add to the specular map of the ABS Plastic Materials (mesh must be unwrapped)",
+        description="Amount of fingerprints and dust to add to the specular map of the ABS Plastic Materials",
         subtype="FACTOR",
         min=0, max=1,
         precision=3,
@@ -152,21 +152,30 @@ def register():
     )
     Scene.abs_displace = FloatProperty(
         name="Displacement",
-        description="Bumpiness of the ABS Plastic Materials (mesh must be unwrapped; 0.04 recommended)",
+        description="Bumpiness of the ABS Plastic Materials (0.04 recommended)",
         subtype="FACTOR",
         min=0, soft_max=1,
         precision=3,
         update=update_abs_displace,
         default=0.0,
     )
-    Scene.uv_detail_quality = FloatProperty(
-        name="UV Detail Quality",
-        description="Quality of the fingerprints and dust detailing (save memory by reducing quality)",
+    Scene.abs_fpd_quality = FloatProperty(
+        name="FP/Dust Quality",
+        description="Quality of the fingerprints and dust textures (save memory by reducing quality)",
         subtype="FACTOR",
         min=0, max=1,
         precision=1,
-        update=update_image,
-        default=1,
+        update=update_fd_image,
+        default=0.5,
+    )
+    Scene.abs_s_quality = FloatProperty(
+        name="Scratch Quality",
+        description="Quality of the scratch texture (save memory by reducing quality)",
+        subtype="FACTOR",
+        min=0, max=1,
+        precision=1,
+        update=update_s_image,
+        default=0.5,
     )
     Scene.abs_uv_scale = FloatProperty(
         name="UV Scale",
@@ -220,7 +229,7 @@ def unregister():
     del Material.abs_plastic_version
     del Scene.abs_viewport_transparency
     del Scene.save_datablocks
-    del Scene.uv_detail_quality
+    del Scene.abs_fpd_quality
     del Scene.abs_displace
     del Scene.abs_fingerprints
     del Scene.abs_randomize

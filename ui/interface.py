@@ -119,14 +119,16 @@ class PROPERTIES_PT_abs_plastic_materials_texture_mapping(Panel):
         col.prop(scn, "abs_mapping", text="Mapping")
         col.prop(scn, "abs_displace")
         col.prop(scn, "abs_uv_scale", text="Scale")
-        col.prop(scn, "uv_detail_quality", text="Quality")
+        col.prop(scn, "abs_fpd_quality", text="FP/Dust Quality")
+        if b280():
+            col.prop(scn, "abs_s_quality", text="Scratch Quality")
 
 
 class PROPERTIES_PT_abs_plastic_materials_dev_tools(Panel):
     bl_space_type  = 'PROPERTIES'
     bl_region_type = 'WINDOW'
     bl_context     = "material"
-    bl_label       = "Dev Tools" if b280() else "Dev Tools"
+    bl_label       = "Dev Tools" if b280() else "ABS Plastic Dev Tools"
     bl_parent_id   = "PROPERTIES_PT_abs_plastic_materials"
     bl_idname      = "PROPERTIES_PT_abs_plastic_materials_dev_tools"
     # bl_category    = "ABS Plastic Materials"

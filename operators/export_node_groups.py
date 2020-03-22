@@ -40,7 +40,13 @@ class ABS_OT_export_node_groups(Operator):
 
     def execute(self, context):
         data_blocks = []
-        data_blocks.append(bpy.data.images.get("ABS Fingerprints and Dust"))
+
+        # un-map image nodes from image data blocks
+        for gn in ("ABS_Fingerprint", "ABS_Specular Map", "ABS_Scratches"):
+            ng = bpy.data.node_groups.get(gn)
+            for node in ng.nodes:
+                if node.type == "TEX_IMAGE":
+                    node.image = None
 
         # append node groups from nodeDirectory
         group_names = ("ABS_Bump", "ABS_Dialectric", "ABS_Transparent", "ABS_Uniform Scale", "ABS_Translate")
@@ -55,5 +61,12 @@ class ABS_OT_export_node_groups(Operator):
         bpy.data.libraries.write(storage_path, set(data_blocks), fake_user=True)
 
         self.report({"INFO"}, "Exported successfully!")
+
+        # re-map image nodes back to correct image data block
+        for gn in ("ABS_Fingerprint", "ABS_Specular Map", "ABS_Scratches"):
+            ng = bpy.data.node_groups.get(gn)
+            for node in ng.nodes:
+                if node.type == "TEX_IMAGE":
+                    node.image = bpy.data.images.get(node.name)
 
         return {"FINISHED"}

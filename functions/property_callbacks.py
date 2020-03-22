@@ -24,6 +24,7 @@ from bpy.props import *
 
 # Module imports
 from .common import *
+from .general import *
 
 
 def get_mat_names():
@@ -183,38 +184,51 @@ def update_texture_mapping(self, context):
         ng = bpy.data.node_groups.get(ng_name)
         if ng is None:
             continue
-        n_image = ng.nodes.get("ABS_Fingerprints and Dust")
+        n_image = ng.nodes.get("ABS Fingerprints and Dust")
         n_image.projection = "FLAT" if scn.abs_mapping == "UV" else "BOX"
 
 
 
-def update_image(self, context):
+def update_fd_image(self, context):
+    import_im_textures(["ABS Fingerprints and Dust.jpg"])
     im = bpy.data.images.get("ABS Fingerprints and Dust")
-    if im is None: return
     scn = context.scene
-    res = round(scn.uv_detail_quality, 1)
+    res = round(scn.abs_fpd_quality, 1)
     resized_img = get_detail_image(res, im)
     fnode = bpy.data.node_groups.get("ABS_Fingerprint")
     snode = bpy.data.node_groups.get("ABS_Specular Map")
-    image_node1 = fnode.nodes.get("ABS_Fingerprints and Dust")
-    image_node2 = snode.nodes.get("ABS_Fingerprints and Dust")
+    image_node1 = fnode.nodes.get("ABS Fingerprints and Dust")
+    image_node2 = snode.nodes.get("ABS Fingerprints and Dust")
     for img_node in (image_node1, image_node2):
         img_node.image = resized_img
 
 
+def update_s_image(self, context):
+    import_im_textures(["ABS Scratches.jpg"])
+    im = bpy.data.images.get("ABS Scratches")
+    scn = context.scene
+    res = round(scn.abs_s_quality, 1)
+    resized_img = get_detail_image(res, im)
+    fnode = bpy.data.node_groups.get("ABS_Scratches")
+    im_node = fnode.nodes.get("ABS Scratches")
+    im_node.image = resized_img
+
+
 def get_detail_image(res, full_img):
     # create smaller fingerprints/dust images
-    new_img_name = "ABS Fingerprints and Dust" if res == 1 else "ABS Fingerprints and Dust (%(res)s)" % locals()
+    if res == 1:
+        return full_img
+    new_img_name = "{im_name} ({res}).jpg".format(im_name=full_img.name.replace(".jpg", ""), res=res)
     detail_img_scaled = bpy.data.images.get(new_img_name)
     if detail_img_scaled is None:
         detail_img_scaled = duplicate_image(full_img, new_img_name)
-        newScale = 2000 * res
-        detail_img_scaled.scale(newScale, newScale)
+        new_size = Vector(full_img.size) * res
+        detail_img_scaled.scale(new_size.x, new_size.y)
     return detail_img_scaled
 
 
 def duplicate_image(img, name):
     width, height = img.size
     new_image = bpy.data.images.new(name, width, height)
-    new_image.pixels = img.pixels[:]
+    set_pixels(new_image, get_pixels(img))
     return new_image

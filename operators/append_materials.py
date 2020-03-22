@@ -53,15 +53,16 @@ class ABS_OT_append_materials(Operator):
         last_render_engine = scn.render.engine
         scn.render.engine = "CYCLES"
 
-        # define images and node groups to replace
-        images_to_replace = ("ABS Fingerprints and Dust",)
+        # define node groups to replace
         node_groups_to_replace = ("ABS_Absorbtion", "ABS_Basic Noise", "ABS_Bump", "ABS_Dialectric", "ABS_Dialectric 2", "ABS_Fingerprint", "ABS_Fresnel", "ABS_GlassAbsorption", "ABS_Parallel_Scratches", "ABS_PBR Glass", "ABS_Principled", "ABS_Random Value", "ABS_Randomize Color", "ABS_Reflection", "ABS_RotateXYZ", "RotateX", "RotateY", "RotateZ", "ABS_Scale", "ABS_Scratches", "ABS_Specular Map", "ABS_Transparent", "ABS_Uniform Scale", "ABS_Translate")
 
         # define file paths
-        addon_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         blend_file_name = "node_groups_2-8.blend" if b280() else "node_groups_2-7.blend"
-        blend_file = os.path.join(addon_path, "lib", blend_file_name)
-        im_path = os.path.join(addon_path, "lib", "ABS Fingerprints and Dust.png")
+        blend_file = os.path.join(get_addon_directory(), "lib", blend_file_name)
+        im_names = {
+            "ABS Fingerprints and Dust": "ABS Fingerprints and Dust (0.5).jpg" if round(scn.abs_fpd_quality, 1) == 0.5 else "ABS Fingerprints and Dust.jpg",
+            "ABS Scratches": "ABS Scratches (0.5).jpg" if round(scn.abs_s_quality, 1) == 0.5 else "ABS Scratches.jpg",
+        }
 
         # set cm.brick_materials_are_dirty for all models in Bricker, if it's installed
         if hasattr(scn, "cmlist"):
@@ -72,21 +73,15 @@ class ABS_OT_append_materials(Operator):
         if len(already_imported) == 0 or outdated_version or force_reload:
             load_from_library(blend_file, "node_groups", overwrite_data=True)
             bpy.data.node_groups["ABS_Transparent"].use_fake_user = True
-            # remove existing bump/specular maps
-            for im_name in images_to_replace:
-                im = bpy.data.images.get(im_name)
-                if im is not None: bpy.data.images.remove(im)
-            # load image from lib/ folder
-            bpy.ops.image.open(filepath=im_path)
-            im = bpy.data.images.get("ABS Fingerprints and Dust.png")
-            im.name = "ABS Fingerprints and Dust"
+            # load image textures from 'lib' folder
+            import_im_textures(im_names.values(), replace_existing=True)
             # map image nodes to correct image data block
-            im.update()
-            for gn in ("ABS_Fingerprint", "ABS_Specular Map"):
+            for gn in ("ABS_Fingerprint", "ABS_Specular Map", "ABS_Scratches"):
                 ng = bpy.data.node_groups.get(gn)
                 for node in ng.nodes:
                     if node.type == "TEX_IMAGE":
-                        node.image = im
+                        target_im_name = im_names[node.name]
+                        node.image = bpy.data.images.get(target_im_name)
 
         for mat_name in mat_names:
             # if material exists, remove or skip
@@ -131,9 +126,12 @@ class ABS_OT_append_materials(Operator):
                 n_displace.inputs["Midlevel"].default_value = 0.0
                 n_displace.inputs["Scale"].default_value = 0.01
             n_tex = nodes.new("ShaderNodeTexCoord")
-            n_geometry = nodes.new("ShaderNodeNewGeometry")
-            for output in n_geometry.outputs:
-                if output.name != "Random Per Island":
+            if bpy.app.version[:2] >= (2, 82):
+                n_random = nodes.new("ShaderNodeNewGeometry")
+            else:
+                n_random = nodes.new("ShaderNodeObjectInfo")
+            for output in n_random.outputs:
+                if not output.name.startswith("Random"):
                     output.hide = True
             n_translate = nodes.new("ShaderNodeGroup")
             n_translate.node_tree = bpy.data.node_groups.get("ABS_Translate")
@@ -149,8 +147,12 @@ class ABS_OT_append_materials(Operator):
             # else:
             #     links.new(n_bump.outputs["Color"], n_output.inputs["Displacement"])
             links.new(n_tex.outputs[scn.abs_mapping], n_translate.inputs["Vector"])
-            links.new(n_geometry.outputs["Random Per Island"], n_translate.inputs["X"])
-            links.new(n_geometry.outputs["Random Per Island"], n_translate.inputs["Y"])
+            if bpy.app.version[:2] >= (2, 82):
+                links.new(n_random.outputs["Random Per Island"], n_translate.inputs["X"])
+                links.new(n_random.outputs["Random Per Island"], n_translate.inputs["Y"])
+            else:
+                links.new(n_random.outputs["Random"], n_translate.inputs["X"])
+                links.new(n_random.outputs["Random"], n_translate.inputs["Y"])
             links.new(n_translate.outputs["Vector"], n_scale.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_shader.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_bump.inputs["Vector"])
@@ -163,7 +165,7 @@ class ABS_OT_append_materials(Operator):
                 n_displace.location = n_output.location - Vector((000, 200))
             n_scale.location = n_output.location - Vector((400, 200))
             n_translate.location = n_output.location - Vector((600, 200))
-            n_geometry.location = n_output.location - Vector((800, 125))
+            n_random.location = n_output.location - Vector((800, 125))
             n_tex.location = n_output.location - Vector((800, 200))
 
             # set properties

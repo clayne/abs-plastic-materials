@@ -17,4 +17,5 @@
 
 from .common import *
 from .app_handlers import *
+from .general import *
 from .property_callbacks import *
