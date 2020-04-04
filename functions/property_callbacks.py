@@ -174,11 +174,11 @@ def update_texture_mapping(self, context):
         n_tex = mat.node_tree.nodes.get("Texture Coordinate")
         if n_tex is None:
             continue
-        n_trans = mat.node_tree.nodes.get("ABS_Translate")
-        if n_trans is None:
+        n_scale = mat.node_tree.nodes.get("ABS_Scale")
+        if n_scale is None:
             continue
         links = mat.node_tree.links
-        links.new(n_tex.outputs[scn.abs_mapping], n_trans.inputs[-1])
+        links.new(n_tex.outputs[scn.abs_mapping], n_scale.inputs["Vector"])
     groups_to_update = ("ABS_Fingerprint", "ABS_Specular Map")
     for ng_name in groups_to_update:
         ng = bpy.data.node_groups.get(ng_name)
@@ -191,7 +191,7 @@ def update_texture_mapping(self, context):
 
 def update_fd_image(self, context):
     import_im_textures(["ABS Fingerprints and Dust.jpg"])
-    im = bpy.data.images.get("ABS Fingerprints and Dust")
+    im = bpy.data.images.get("ABS Fingerprints and Dust.jpg")
     scn = context.scene
     res = round(scn.abs_fpd_quality, 1)
     resized_img = get_detail_image(res, im)
@@ -205,7 +205,7 @@ def update_fd_image(self, context):
 
 def update_s_image(self, context):
     import_im_textures(["ABS Scratches.jpg"])
-    im = bpy.data.images.get("ABS Scratches")
+    im = bpy.data.images.get("ABS Scratches.jpg")
     scn = context.scene
     res = round(scn.abs_s_quality, 1)
     resized_img = get_detail_image(res, im)
@@ -225,10 +225,3 @@ def get_detail_image(res, full_img):
         new_size = Vector(full_img.size) * res
         detail_img_scaled.scale(new_size.x, new_size.y)
     return detail_img_scaled
-
-
-def duplicate_image(img, name):
-    width, height = img.size
-    new_image = bpy.data.images.new(name, width, height)
-    set_pixels(new_image, get_pixels(img))
-    return new_image

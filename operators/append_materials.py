@@ -126,13 +126,26 @@ class ABS_OT_append_materials(Operator):
                 n_displace.inputs["Midlevel"].default_value = 0.0
                 n_displace.inputs["Scale"].default_value = 0.01
             n_tex = nodes.new("ShaderNodeTexCoord")
+            for output in n_tex.outputs:
+                if output.name not in ("Generated", "UV"):
+                    output.hide = True
             if bpy.app.version[:2] >= (2, 82):
-                n_random = nodes.new("ShaderNodeNewGeometry")
-            else:
-                n_random = nodes.new("ShaderNodeObjectInfo")
-            for output in n_random.outputs:
+                n_geom = nodes.new("ShaderNodeNewGeometry")
+                n_geom.mute = True
+                for output in n_geom.outputs:
+                    if not output.name.startswith("Random"):
+                        output.hide = True
+                n_math2 = nodes.new("ShaderNodeMath")
+                n_math2.operation = "ADD"
+                n_math2.hide = True
+            n_obj_info = nodes.new("ShaderNodeObjectInfo")
+            for output in n_obj_info.outputs:
                 if not output.name.startswith("Random"):
                     output.hide = True
+            n_math = nodes.new("ShaderNodeMath")
+            n_math.operation = "MULTIPLY"
+            n_math.inputs[1].default_value = 100
+            n_math.hide = True
             n_translate = nodes.new("ShaderNodeGroup")
             n_translate.node_tree = bpy.data.node_groups.get("ABS_Translate")
             n_translate.name = "ABS_Translate"
@@ -148,25 +161,33 @@ class ABS_OT_append_materials(Operator):
             #     links.new(n_bump.outputs["Color"], n_output.inputs["Displacement"])
             links.new(n_tex.outputs[scn.abs_mapping], n_translate.inputs["Vector"])
             if bpy.app.version[:2] >= (2, 82):
-                links.new(n_random.outputs["Random Per Island"], n_translate.inputs["X"])
-                links.new(n_random.outputs["Random Per Island"], n_translate.inputs["Y"])
+                links.new(n_geom.outputs["Random Per Island"], n_math2.inputs[0])
+                links.new(n_obj_info.outputs["Random"], n_math2.inputs[1])
+                links.new(n_math2.outputs["Value"], n_math.inputs[0])
             else:
-                links.new(n_random.outputs["Random"], n_translate.inputs["X"])
-                links.new(n_random.outputs["Random"], n_translate.inputs["Y"])
+                links.new(n_obj_info.outputs["Random"], n_math.inputs[0])
+            links.new(n_math.outputs["Value"], n_translate.inputs["X"])
+            links.new(n_math.outputs["Value"], n_translate.inputs["Y"])
+            # links.new(n_math.outputs["Value"], n_translate.inputs["Z"])
             links.new(n_translate.outputs["Vector"], n_scale.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_shader.inputs["Vector"])
             links.new(n_scale.outputs["Vector"], n_bump.inputs["Vector"])
 
             # position the nodes in 2D space
+            n_output.location.x += 200
             starting_loc = n_output.location
-            n_shader.location = n_output.location - Vector((200, -250))
-            n_bump.location = n_output.location - Vector((200, 200))
+            n_shader.location = starting_loc - Vector((400, -250))
+            n_bump.location = starting_loc - Vector((400, 150))
             if b280():
-                n_displace.location = n_output.location - Vector((000, 200))
-            n_scale.location = n_output.location - Vector((400, 200))
-            n_translate.location = n_output.location - Vector((600, 200))
-            n_random.location = n_output.location - Vector((800, 125))
-            n_tex.location = n_output.location - Vector((800, 200))
+                n_displace.location = starting_loc - Vector((200, 150))
+            n_scale.location = starting_loc - Vector((600, 150))
+            n_translate.location = starting_loc - Vector((800, 150))
+            n_math.location = starting_loc - Vector((1000, 182))
+            n_tex.location = starting_loc - Vector((1000, 225))
+            n_obj_info.location = starting_loc - Vector((1200, 150))
+            if b280():
+                n_geom.location = starting_loc - Vector((1200, 75))
+                n_math2.location = starting_loc - Vector((1000, 132))
 
             # set properties
             mat_properties = bpy.props.abs_mat_properties

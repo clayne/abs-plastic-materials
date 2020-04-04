@@ -42,10 +42,12 @@ class ABS_OT_export_node_groups(Operator):
         data_blocks = []
 
         # un-map image nodes from image data blocks
+        backup_ims = {}
         for gn in ("ABS_Fingerprint", "ABS_Specular Map", "ABS_Scratches"):
             ng = bpy.data.node_groups.get(gn)
             for node in ng.nodes:
                 if node.type == "TEX_IMAGE":
+                    backup_ims[node.name] = node.image
                     node.image = None
 
         # append node groups from nodeDirectory
@@ -67,6 +69,6 @@ class ABS_OT_export_node_groups(Operator):
             ng = bpy.data.node_groups.get(gn)
             for node in ng.nodes:
                 if node.type == "TEX_IMAGE":
-                    node.image = bpy.data.images.get(node.name)
+                    node.image = backup_ims[node.name]
 
         return {"FINISHED"}
