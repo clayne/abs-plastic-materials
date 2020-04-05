@@ -185,7 +185,7 @@ class ABS_OT_append_materials(Operator):
             n_math.location = starting_loc - Vector((1000, 182))
             n_tex.location = starting_loc - Vector((1000, 225))
             n_obj_info.location = starting_loc - Vector((1200, 150))
-            if b280():
+            if bpy.app.version[:2] >= (2, 82):
                 n_geom.location = starting_loc - Vector((1200, 75))
                 n_math2.location = starting_loc - Vector((1000, 132))
 
