@@ -115,6 +115,7 @@ class ABS_OT_append_materials(Operator):
             else:
                 n_shader.node_tree = bpy.data.node_groups.get("ABS_Dialectric")
                 n_shader.name = "ABS Dialectric"
+                n_shader.inputs["SSS Default"].hide = True
             n_bump = nodes.new("ShaderNodeGroup")
             n_bump.node_tree = bpy.data.node_groups.get("ABS_Bump")
             n_bump.name = "ABS Bump"
@@ -176,7 +177,7 @@ class ABS_OT_append_materials(Operator):
             # position the nodes in 2D space
             n_output.location.x += 200
             starting_loc = n_output.location
-            n_shader.location = starting_loc - Vector((400, -250))
+            n_shader.location = starting_loc - Vector((400, -200))
             n_bump.location = starting_loc - Vector((400, 150))
             if b280():
                 n_displace.location = starting_loc - Vector((200, 150))
