@@ -19,7 +19,7 @@ bl_info = {
     "name"        : "ABS Plastic Materials",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
     "version"     : (3, 0, 0),
-    "blender"     : (2, 83, 0),
+    "blender"     : (2, 82, 0),
     "description" : "Append ABS Plastic Materials to current blender file with a simple click",
     "location"    : "PROPERTIES > Materials > ABS Plastic Materials",
     "warning"     : "", #"Untested Beta release – update to official release when available",  # used for warning icon and text in addons panel
@@ -43,11 +43,20 @@ from bpy.utils import register_class, unregister_class
 props = bpy.props
 
 # Module imports
-from .functions.app_handlers import *
-from .functions import *
-from .lib import preferences, classes_to_register
-from . import addon_updater_ops
-from .lib.mat_properties import mat_properties
+if "classes_to_register" in locals():
+    import importlib
+    addon_updater_ops = importlib.reload(addon_updater_ops)
+    make_annotations = importlib.reload(make_annotations)
+    app_handlers = importlib.reload(app_handlers)
+    property_callbacks = importlib.reload(property_callbacks)
+    classes_to_register = importlib.reload(classes_to_register)
+    mat_properties = importlib.reload(mat_properties)
+else:
+    from . import addon_updater_ops
+    from .functions import make_annotations, app_handlers, property_callbacks
+    from .lib import classes_to_register
+    from .lib.mat_properties import mat_properties
+
 
 def register():
     for cls in classes_to_register.classes:
@@ -62,7 +71,7 @@ def register():
     bpy.props.abs_mats_common = [
         "ABS Plastic Black",
         "ABS Plastic Blue",
-        "ABS Plastic Brown",
+        "ABS Plastic Reddish Brown",
         "ABS Plastic Dark Azur",
         "ABS Plastic Dark Blue",
         "ABS Plastic Dark Brown",
@@ -111,6 +120,7 @@ def register():
         "ABS Plastic Magenta",
         "ABS Plastic Medium Dark Flesh",
         "ABS Plastic Medium Lavender",
+        "ABS Plastic Olive Green",
         "ABS Plastic Silver",
         "ABS Plastic Teal",
     ]
@@ -121,7 +131,7 @@ def register():
         subtype="FACTOR",
         min=0, soft_max=1,
         precision=3,
-        update=update_abs_subsurf,
+        update=property_callbacks.update_abs_subsurf,
         default=1,
     )
     Scene.abs_roughness = FloatProperty(
@@ -130,7 +140,7 @@ def register():
         subtype="FACTOR",
         min=0, max=1,
         precision=3,
-        update=update_abs_roughness,
+        update=property_callbacks.update_abs_roughness,
         default=0.005,
     )
     Scene.abs_randomize = FloatProperty(
@@ -139,7 +149,7 @@ def register():
         subtype="FACTOR",
         min=0, soft_max=1,
         precision=3,
-        update=update_abs_randomize,
+        update=property_callbacks.update_abs_randomize,
         default=0.025,
     )
     Scene.abs_fingerprints = FloatProperty(
@@ -148,7 +158,7 @@ def register():
         subtype="FACTOR",
         min=0, max=1,
         precision=3,
-        update=update_abs_fingerprints,
+        update=property_callbacks.update_abs_fingerprints,
         default=0.25,
     )
     Scene.abs_displace = FloatProperty(
@@ -157,7 +167,7 @@ def register():
         subtype="FACTOR",
         min=0, soft_max=1,
         precision=3,
-        update=update_abs_displace,
+        update=property_callbacks.update_abs_displace,
         default=0.0,
     )
     Scene.abs_fpd_quality = FloatProperty(
@@ -166,7 +176,7 @@ def register():
         subtype="FACTOR",
         min=0, max=1,
         precision=1,
-        update=update_fd_image,
+        update=property_callbacks.update_fd_image,
         default=0.5,
     )
     Scene.abs_s_quality = FloatProperty(
@@ -175,26 +185,26 @@ def register():
         subtype="FACTOR",
         min=0, max=1,
         precision=1,
-        update=update_s_image,
+        update=property_callbacks.update_s_image,
         default=0.5,
     )
     Scene.abs_uv_scale = FloatProperty(
         name="UV Scale",
         description="Update the universal scale of the Fingerprints & Dust UV Texture",
         min=0,
-        update=update_abs_uv_scale,
+        update=property_callbacks.update_abs_uv_scale,
         default=1,
     )
     Scene.save_datablocks = BoolProperty(
         name="Save Data-Blocks",
         description="Save ABS Plastic Materials even if they have no users",
-        update=toggle_save_datablocks,
+        update=property_callbacks.toggle_save_datablocks,
         default=True,
     )
     Scene.abs_viewport_transparency = BoolProperty(
         name="Viewport Transparency",
         description="Display trans- materials as partially transparent in the 3D viewport",
-        update=update_viewport_transparency,
+        update=property_callbacks.update_viewport_transparency,
         default=False,
     )
     Scene.abs_mapping = EnumProperty(
@@ -204,7 +214,7 @@ def register():
             ("UV", "UV", "Use active UV map"),
             ("Generated", "Generated", "Use generated texture coordinates"),
         ],
-        update=update_texture_mapping,
+        update=property_callbacks.update_texture_mapping,
         default="Generated",
     )
 
@@ -212,7 +222,7 @@ def register():
     Material.abs_plastic_version = StringProperty(default="2.1.0")
 
     # register app handlers
-    bpy.app.handlers.load_post.append(handle_upconversion)
+    bpy.app.handlers.load_post.append(app_handlers.handle_upconversion)
 
     # addon updater code and configurations
     addon_updater_ops.register(bl_info)
@@ -225,7 +235,7 @@ def unregister():
     addon_updater_ops.unregister()
 
     # unregister app handlers
-    bpy.app.handlers.load_post.remove(handle_upconversion)
+    bpy.app.handlers.load_post.remove(app_handlers.handle_upconversion)
 
     del Material.abs_plastic_version
     del Scene.abs_viewport_transparency
