@@ -18,8 +18,10 @@
 # System imports
 import math
 from colorsys import rgb_to_hsv, hsv_to_rgb
+from os.path import join, dirname, basename
 import numpy as np
-import types
+import time
+import types as py_types
 
 # Blender imports
 import bpy
@@ -28,17 +30,18 @@ import bmesh
 from mathutils import Vector, Color
 
 # Module imports
-from .color_effects import *
+from .blender import link_object
+from .images import *
 from .maths import *
+from .paths import *
 from .python_utils import *
 from .reporting import stopwatch
-from .blender import link_object
 
 
 class Vector2:
     """ Implementation of the mathutils 'Vector' data type that supports double precision """
     def __init__(self, value=(0, 0, 0)):
-        assert type(value) in (tuple, list, Vector, Vector2, types.GeneratorType, bpy_prop_array)
+        assert type(value) in (tuple, list, Vector, Vector2, py_types.GeneratorType, bpy_prop_array)
         if type(value) in (Vector, Color, bpy_prop_array):
             self._seq = [round(i, 6) for i in value]
         else:
@@ -47,17 +50,26 @@ class Vector2:
     def __str__(self):
         return "<Vector2(" + str(tuple(self._seq)) + ")>"
 
+    def __neg__(self):
+        return Vector2([-i for i in self._seq])
+
+    def __pos__(self):
+        return self.copy()
+
+    def __abs__(self):
+        return Vector2([abs(i) for i in self._seq])
+
     def __add__(self, other):
         new_vec = Vector2(self.to_list())
         if type(other) in (Vector2, Vector):
             assert len(self) == len(other)
             for i in range(len(new_vec)):
                 new_vec[i] += other[i]
-        elif type(other) in (int, float):
+        elif type(other) in (float, int):
             for i in range(len(new_vec)):
                 new_vec[i] += other
         else:
-            raise Exception("Vector2 addition: (Vector2 and {}) invalid type for this operation")
+            raise Exception("Vector2 addition: (Vector2 and {}) invalid type for this operation").format(type(other))
         return new_vec
 
     def __sub__(self, other):
@@ -66,11 +78,11 @@ class Vector2:
             assert len(self) == len(other)
             for i in range(len(new_vec)):
                 new_vec[i] -= other[i]
-        elif type(other) in (int, float):
+        elif type(other) in (float, int):
             for i in range(len(new_vec)):
                 new_vec[i] -= other
         else:
-            raise Exception("Vector2 subtraction: (Vector2 and {}) invalid type for this operation")
+            raise Exception("Vector2 subtraction: (Vector2 and {}) invalid type for this operation").format(type(other))
         return new_vec
 
     def __mul__(self, other):
@@ -79,11 +91,11 @@ class Vector2:
             assert len(self) == len(other)
             for i in range(len(new_vec)):
                 new_vec[i] *= other[i]
-        elif type(other) in (int, float):
+        elif type(other) in (float, int):
             for i in range(len(new_vec)):
                 new_vec[i] *= other
         else:
-            raise Exception("Vector2 multiplication: (Vector2 and {}) invalid type for this operation")
+            raise Exception("Vector2 multiplication: (Vector2 and {}) invalid type for this operation").format(type(other))
         return new_vec
 
     def __div__(self, other):
@@ -131,14 +143,25 @@ class Vector2:
         else:
             raise StopIteration
 
-    def length(self):
-        return len(self._seq)
-
     def to_list(self):
         return self._seq.copy()
 
     def to_tuple(self):
         return tuple(self._seq)
+
+    def to_3d(self):
+        if self.length == 2:
+            return Vector2(self._seq + [0])
+        else:
+            return Vector2(self._seq[:3])
+
+    def dot(self, vec):
+        assert len(vec) == len(self._seq)
+        return sum(i[0] * i[1] for i in zip(self._seq, vec))
+
+    @property
+    def length(self):
+        return math.sqrt(sum([v**2 for v in self._seq]))
 
     @property
     def x(self):
@@ -162,7 +185,7 @@ class Vector2:
             raise AttributeErorr("unavailable on 2d vector")
         return self._seq[2]
 
-    @y.setter
+    @z.setter
     def z(self, value):
         self._seq[2] = value
 
@@ -174,6 +197,15 @@ class Vector2:
     def xy(self, value):
         self.x = value[0]
         self.y = value[1]
+
+    @property
+    def yx(self):
+        return Vector2(self._seq[1::-1])
+
+    @yx.setter
+    def yx(self, value):
+        self.y = value[0]
+        self.x = value[1]
 
 
 class Island:
@@ -209,7 +241,39 @@ class Island:
     def type(self):
         return self._type
 
-    def to_bmesh(self, face=True, bme=None):
+    def append(self, coord):
+        assert type(coord) in (tuple, list, Vector, Vector2)
+        return self._coords.append(coord)
+
+    def invert_distribution(self):
+        self._distribution = [[not val for val in col] for col in self._distribution]
+
+    def print_distribution(self):
+        print()
+        distribution = self._distribution
+        for y in range(len(distribution[0]) - 1, -1, -1):
+            for x in range(len(distribution)):
+                print("X " if distribution[x][y] else "_ ", end="")
+            print()
+        print()
+
+    def dilate_erode(self, dist):
+        if self.type == "OUTLINE":
+            return
+        if self._inverted:
+            dist *= -1
+        bme = self.to_bmesh()
+        mesh_offset(bme, dist)
+        self.from_bmesh(bme)
+
+    def transform(self, mx):
+        bme = self.to_bmesh(face=False)
+        if len(mx[0]) == 3:
+            mx = mx_2d_to_3d(mx)
+        bmesh.ops.transform(bme, matrix=mx, verts=bme.verts)
+        self.from_bmesh(bme)
+
+    def to_bmesh(self, bme=None, face=True):
         bme = bme or bmesh.new()
         verts = list()
         for coord in self._coords:
@@ -230,15 +294,12 @@ class Island:
     def from_bmesh(self, bme):
         self._coords = [Vector2(v.co) for v in bme.verts]
 
-    def draw_mesh(self, face=True):
+    def draw(self, face=True):
         m = bpy.data.meshes.new(str(self))
         self.to_mesh(m, face=face)
         obj = bpy.data.objects.new(str(self), m)
         link_object(obj)
-
-    def append(self, coord):
-        assert type(coord) in (tuple, list, Vector, Vector2)
-        return self._coords.append(coord)
+        return obj
 
 
 class Archipelago:
@@ -287,6 +348,21 @@ class Archipelago:
             all_coords += island.coords
         return all_coords
 
+    def append(self, island):
+        assert type(island) in (tuple, list, Island)
+        return self._islands.append(island if isinstance(island, Island) else Island(island))
+
+    def dilate_erode(self, dist):
+        for island in self._islands:
+            island.dilate_erode(dist)
+
+    def invert(self):
+        self._inverted = not self._inverted
+
+    def transform(self, mx):
+        for island in self._islands:
+            island.transform(mx)
+
     def to_mesh(self, mesh, face=True, island_types=None):
         bme = bmesh.new()
         for island in self._islands:
@@ -294,16 +370,12 @@ class Archipelago:
                 island.to_bmesh(bme, face=face)
         return bme.to_mesh(mesh)
 
-    def draw_mesh(self, face=True, island_types=None):
+    def draw(self, face=True, island_types=None):
         m = bpy.data.meshes.new(str(self))
         self.to_mesh(m, face, island_types)
         obj = bpy.data.objects.new(str(self), m)
         link_object(obj)
         return obj
-
-    def append(self, island):
-        assert type(island) in (tuple, list, Island)
-        return self._islands.append(island if isinstance(island, Island) else Island(island))
 
 
 class ArchipelagoSequence:
@@ -348,11 +420,22 @@ class ArchipelagoSequence:
         assert isinstance(arch, Archipelago)
         return self._archipelagos.append(arch)
 
+    def dilate_erode(self, dist):
+        for archipelago in self._archipelagos:
+            archipelago.dilate_erode(dist)
+
+    def invert(self):
+        for archipelago in self._archipelagos:
+            archipelago.invert()
+
+    def transform(self, mx):
+        for archipelago in self._archipelagos:
+            archipelago.transform(mx)
+
 
 class MyImage:
     """ data type for storing and manipulating images with real-world dimensions """
     def __init__(self, pixels, size=(1, 1), name="Image", dimensions=None, channels=None, display_aspect=(1, 1), file_extension=".png"):
-        assert channels and type(channels) in (int, None) and channels in (None, 1, 3, 4)
         assert size and size[0] > 0 and size[1] > 0
         self._name = name
         self.pixels = pixels
@@ -360,6 +443,7 @@ class MyImage:
         self.dimensions = dimensions
         self._display_aspect = display_aspect
         self._channels = channels or len(self.pixels) // (size[0] * size[1])
+        assert self._channels and isinstance(self._channels, int) and self._channels in (1, 3, 4)
         self._file_extension = file_extension
 
     def __str__(self):
@@ -393,7 +477,7 @@ class MyImage:
 
     @pixels.setter
     def pixels(self, value):
-        if type(value) in (tuple, list, bpy.types.bpy_prop_array):
+        if type(value) in (tuple, list, Color, bpy.types.bpy_prop_array):
             self._pixels = np.array(value)
         elif isinstance(value, np.ndarray):
             self._pixels = value
@@ -450,15 +534,15 @@ class MyImage:
         if space == "RELATIVE":
             translate_x = round(translate_x * self.size[0])
             translate_y = round(translate_y * self.size[1])
-        elif space == "DIMENSIONS":
+        elif space == "METRIC":
             translate_x = round(translate_x * (self.size[0] / self.dimensions[0]))
-            translate_y = round(translate_y * (self.size[1] / self.dimensions[0]))
+            translate_y = round(translate_y * (self.size[1] / self.dimensions[1]))
         elif space == "PIXELS":
             translate_x = round(translate_x)
             translate_y = round(translate_y)
         # expand the canvas if necessary
         if expand_canvas:
-            self.pad_to_size(new_size=(self.size[0] + abs(translate_x) * 2, self.size[1] + abs(translate_y) * 2))
+            self.pad_to_size(width=self.size[0] + abs(translate_x) * 2, height=self.size[1] + abs(translate_y) * 2)
         # translate the pixels
         old_pixels = self._pixels
         pixels = translate_pixels(old_pixels, translate_x, translate_y, wrap_x, wrap_y, self.size[0], self.size[1], self.channels)
@@ -477,11 +561,12 @@ class MyImage:
         old_pixels = self._pixels
         old_size = np.array(self.size)
         if preserve_canvas:
-            pixels = resize_pixels_preserve_canvas(new_size, self._channels, old_pixels, old_size)
+            pixels = resize_pixels_preserve_borders(new_size, self._channels, old_pixels, old_size)
         else:
             pixels = resize_pixels(new_size, self._channels, old_pixels, old_size)
         self.pixels = pixels
         if not preserve_canvas:
+            self.dimensions = vec_mult(self.dimensions, new_size / self.size)
             self.size = new_size
 
     def crop(self, width=None, height=None):
@@ -496,7 +581,7 @@ class MyImage:
         self.pixels = pixels
         self.size = new_size
 
-    def pad_to_size(self, width=None, height=None, fill=0):
+    def pad_to_size(self, width=None, height=None):
         if width is None:
             width = self.size[0]
         if height is None:
@@ -506,17 +591,15 @@ class MyImage:
         new_size = np.array((width, height))
         old_pixels = self._pixels
         old_size = np.array(self.size)
-        self.pixels = pad_pixels(new_size, self._channels, old_pixels, old_size, fill)
-        # print(len(pixels))
-        # self.pixels = np.pad(old_pixels, new_size[0] * new_size[1])
-        # print(len(self.pixels))
+        self.pixels = pad_pixels(new_size, self._channels, old_pixels, old_size)
         self.dimensions = vec_mult(self.dimensions, new_size / self.size)
         self.size = new_size
 
     def write_to_disk(self, directory="//", name=None):
         name = name or self.name
         image = self.make_blend_image(name + "__dup__")
-        image.filepath_raw = os.path.join(directory, name + self.file_extension)
+        image_fp = join(directory, name + self.file_extension)
+        image.filepath_raw = image_fp
         file_formats = {
             ".png": "PNG",
             ".jpg": "JPEG",
@@ -526,6 +609,7 @@ class MyImage:
         image.file_format = file_formats[self.file_extension]
         image.save()
         bpy.data.images.remove(image)
+        return bpy.path.abspath(image_fp)
 
     def to_hsv(self):
         assert self._channels >= 3
@@ -574,9 +658,11 @@ class MyImage:
         im = bpy.data.images.get(name)
         if overwrite and im:
             bpy.data.images.remove(im)
-        im = bpy.data.images.new(name=name, width=self.size[0], height=self.size[1])
-        self.set_channels(4)
-        set_pixels(im, self.pixels)
+        im = bpy.data.images.new(name=name, alpha=self.channels == 4, width=self.size[0], height=self.size[1])
+        im_pix = self._pixels if self.channels == 4 else convert_channels(4, self._pixels, self._channels)
+        if im_pix.dtype != np.float32:
+            im_pix = im_pix.astype(np.float32)
+        set_pixels(im, im_pix)
         return im
 
     def get_channel(self, channel):
@@ -587,10 +673,14 @@ class MyImage:
     def set_alpha_channel(self, value):
         old_pixels = self._pixels
         num_pix = self.size[0] * self.size[1]
-        self.pixels = set_alpha_channel(num_pix, old_pixels, self._channels, value)
+        assert type(value) in (MyImage, float, int)
+        if isinstance(value, MyImage):
+            assert value.channels == 1
+        alpha_val = value.pixels if isinstance(value, MyImage) else value
+        self.pixels = set_alpha_channel(num_pix, old_pixels, self._channels, alpha_val)
         self._channels = 4
 
-    def set_channels(self, value, verbose=False):
+    def set_channels(self, value, verbose=False, use_alpha=False):
         # check for edge cases
         if value == self._channels:
             return
@@ -604,7 +694,7 @@ class MyImage:
         # add or remove color channel(s) from pixel values
         num_pix = self.size[0] * self.size[1]
         old_pixels = self._pixels
-        pixels = convert_channels(num_pix, value, old_pixels, self._channels)
+        pixels = convert_channels(value, old_pixels, self._channels, use_alpha=use_alpha)
         # set new pixel values and channels
         self.pixels = pixels
         self._channels = value
@@ -644,8 +734,11 @@ class MyImage:
     def clamp(self, minimum=0, maximum=1):
         self.pixels = clamp_pixels(self._pixels, minimum, maximum)
 
-    def math_operation(self, operation, clamp, value):
-        self.pixels = math_operation_on_pixels(self._pixels, operation, clamp, value)
+    def normalize(self):
+        self.pixels = normalize_pixels(self._pixels)
+
+    def math_operation(self, operation, value, clamp=False):
+        self.pixels = math_operation_on_pixels(self._pixels, operation, value, clamp)
 
     def adjust_bright_contrast(self, bright=0, contrast=0):
         self.pixels = adjust_bright_contrast(self._pixels, bright, contrast)
@@ -659,6 +752,11 @@ class MyImage:
 
     def invert(self, factor=1):
         self.pixels = invert_pixels(self._pixels, factor, channels=self._channels)
+
+    def blur(self, radius, filter_type="FLAT", expand_canvas=False):
+        if expand_canvas:
+            self.pad_to_size(width=self.size[0] + radius[0] * 4, height=self.size[1] + radius[1] * 4)
+        self.pixels = blur_pixels(self._pixels, self.size[0], self.size[1], channels=self._channels, blur_radius=radius, filter_type=filter_type)
 
     def dilate(self, pixel_dist:tuple, threshold:float, mode:str="STEP"):  # method: STEP, DISTANCE
         self.set_channels(1)
@@ -693,7 +791,7 @@ class MyImage:
 
 class MyImageSequence:
     """ data type for storing and manipulating sequences of MyImages """
-    def __init__(self, images, offset, name="Image Sequence"):
+    def __init__(self, images, offset=0, name="Image Sequence"):
         assert type(images) in (list, tuple)
         self._name = name
         self.images = images
@@ -717,6 +815,10 @@ class MyImageSequence:
     def images(self, value):
         assert type(value) in (list, tuple)
         self._images = value
+
+    @property
+    def frame_duration(self):
+        return len(self._images)
 
     @property
     def channels(self):
@@ -769,13 +871,21 @@ class MyImageSequence:
         for im in self.images:
             im.pad_to_size(width, height)
 
-    def write_to_disk(self, directory="//", name=None):
-        for im in self.images:
-            im.write_to_disk(directory, name=im.name)
+    def write_to_disk(self, directory="//"):
+        image_filepaths = list()
+        for j, im in enumerate(self.images):
+            im_name = self.name + "_{num}".format(num=str(j + 1).zfill(4))
+            image_fp = im.write_to_disk(directory, name=im_name)
+            image_filepaths.append(image_fp)
+        return image_filepaths
 
-    def make_blend_image(self, name=None, overwrite=True):
+    def make_blend_image(self, name=None, directory=None, overwrite=True):
         assert len(self.images) > 0
-        return self.images[0].make_blend_image(name, overwrite)
+        directory = directory or temp_path()
+        image_fps = self.write_to_disk(directory=directory)
+        im_seq = bpy.data.images.load(image_fps[0])
+        im_seq.source = "SEQUENCE"
+        return im_seq
 
     def get_channel(self, channel):
         new_images = list()
@@ -784,8 +894,11 @@ class MyImageSequence:
         return MyImageSequence(new_images, self.offset)
 
     def set_alpha_channel(self, value):
-        for im in self.images:
-            im.set_alpha_channel(value)
+        if isinstance(value, MyImageSequence):
+            assert self.frame_duration == value.frame_duration
+        for j, im in enumerate(self.images):
+            alpha_val = value.images[j] if isinstance(value, MyImageSequence) else value
+            im.set_alpha_channel(alpha_val)
 
     def set_channels(self, value, verbose=False):
         # check for edge cases
@@ -813,6 +926,14 @@ class MyImageSequence:
         for im in self.images:
             im.clamp(im, minimum, maximum)
 
+    def normalize(self):
+        for im in self.images:
+            im.normalize(im)
+
+    def math_operation(self, operation, value, clamp=False):
+        for im in self.images:
+            im.math_operation(im, operation, value, clamp)
+
     def adjust_bright_contrast(self, bright=0, contrast=0):
         for im in self.images:
             im.adjust_bright_contrast(bright, contrast)
@@ -824,6 +945,10 @@ class MyImageSequence:
     def invert(self, factor=1):
         for im in self.images:
             im.invert(factor)
+
+    def blur(self, radius, filter_type="FLAT", expand_canvas=False):
+        for im in self.images:
+            im.blur(radius, filter_type, expand_canvas)
 
     def dilate(self, pixel_dist:tuple, threshold:float, mode:str="STEP"):
         for im in self.images:

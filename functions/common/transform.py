@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Christopher Gearhart
+# Copyright (C) 2020 Christopher Gearhart
 # chris@bblanimation.com
 # http://bblanimation.com/
 #
@@ -35,10 +35,10 @@ def apply_transform(obj:Object, location:bool=True, rotation:bool=True, scale:bo
     loc, rot, scl = obj.matrix_world.decompose()
     obj.matrix_world = Matrix.Identity(4)
     m = obj.data
-    s_mat_x = Matrix.Scale(scl.x, 4, Vector((1, 0, 0)))
-    s_mat_y = Matrix.Scale(scl.y, 4, Vector((0, 1, 0)))
-    s_mat_z = Matrix.Scale(scl.z, 4, Vector((0, 0, 1)))
     if scale:
+        s_mat_x = Matrix.Scale(scl.x, 4, Vector((1, 0, 0)))
+        s_mat_y = Matrix.Scale(scl.y, 4, Vector((0, 1, 0)))
+        s_mat_z = Matrix.Scale(scl.z, 4, Vector((0, 0, 1)))
         m.transform(mathutils_mult(s_mat_x, s_mat_y, s_mat_z))
     else:
         obj.scale = scl
@@ -73,6 +73,19 @@ def children_clear(parent:Object, apply_transform:bool=True):
         parent_clear(obj, apply_transform=apply_transform)
 
 
+def parent_set(objs:list, parent:Object, keep_transform:bool=False):
+    """ efficiently set parent for obj(s) """
+    objs = confirm_iter(objs)
+    if keep_transform:
+        for obj in objs:
+            last_mx = obj.matrix_world.copy()
+            obj.parent = parent
+            obj.matrix_world = last_mx
+    else:
+        for obj in objs:
+            obj.parent = parent
+
+
 def get_bounds(obj:Object):
     """ brute force method for obtaining object bounding box """
     # initialize min and max
@@ -82,26 +95,27 @@ def get_bounds(obj:Object):
     for v in obj.data.vertices:
         if v.co.x > max.x:
             max.x = v.co.x
-        elif v.co.x < min.x:
+        if v.co.x < min.x:
             min.x = v.co.x
         if v.co.y > max.y:
             max.y = v.co.y
-        elif v.co.y < min.y:
+        if v.co.y < min.y:
             min.y = v.co.y
         if v.co.z > max.z:
             max.z = v.co.z
-        elif v.co.z < min.z:
+        if v.co.z < min.z:
             min.z = v.co.z
     # set up bounding box list of coord lists
-    bound_box = [list(min),
-                 [min.x, min.y, min.z],
-                 [min.x, min.y, max.z],
-                 [min.x, max.y, max.z],
-                 [min.x, max.y, min.z],
-                 [max.x, min.y, min.z],
-                 [max.y, min.y, max.z],
-                 list(max),
-                 [max.x, max.y, min.z]]
+    bound_box = [
+        list(min),
+        [min.x, min.y, max.z],
+        [min.x, max.y, max.z],
+        [min.x, max.y, min.z],
+        [max.x, min.y, min.z],
+        [max.y, min.y, max.z],
+        list(max),
+        [max.x, max.y, min.z],
+    ]
     return bound_box
 
 

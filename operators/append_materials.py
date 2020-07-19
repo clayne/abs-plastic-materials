@@ -21,6 +21,7 @@ import time
 
 # Blender imports
 import bpy
+import addon_utils
 from bpy.types import Operator
 from mathutils import Matrix, Vector
 
@@ -39,6 +40,12 @@ class ABS_OT_append_materials(Operator):
     #     return context.scene.render.engine in ("CYCLES", "BLENDER_EEVEE")
 
     def execute(self, context):
+        # ensure cycles addon is enabled
+        cycles_enabled = addon_utils.check("cycles")[1]
+        if not cycles_enabled:
+            self.report({"WARNING"}, "Please enable the 'Cycles' addon")
+            return {"CANCELLED"}
+
         # initialize variables
         scn = context.scene
         mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
@@ -52,6 +59,7 @@ class ABS_OT_append_materials(Operator):
         # switch to cycles render engine temporarily
         last_render_engine = scn.render.engine
         scn.render.engine = "CYCLES"
+
 
         # define node groups to replace
         node_groups_to_replace = ("ABS_Absorbtion", "ABS_Basic Noise", "ABS_Bump", "ABS_Dialectric", "ABS_Dialectric 2", "ABS_Fingerprint", "ABS_Fresnel", "ABS_GlassAbsorption", "ABS_Parallel_Scratches", "ABS_PBR Glass", "ABS_Principled", "ABS_Random Value", "ABS_Randomize Color", "ABS_Reflection", "ABS_RotateXYZ", "RotateX", "RotateY", "RotateZ", "ABS_Scale", "ABS_Scratches", "ABS_Specular Map", "ABS_Transparent", "ABS_Uniform Scale", "ABS_Translate")
@@ -70,9 +78,15 @@ class ABS_OT_append_materials(Operator):
                 if cm.material_type == "Random":
                     cm.brick_materials_are_dirty = True
 
+        for ng_name in node_groups_to_replace:
+            if ng_name not in bpy.data.node_groups:
+                load_from_library(blend_file, "node_groups", overwrite_data=True)
+                bpy.data.node_groups["ABS_Transparent"].use_fake_user = True
+                break
+
         if len(already_imported) == 0 or outdated_version or force_reload:
-            load_from_library(blend_file, "node_groups", overwrite_data=True)
-            bpy.data.node_groups["ABS_Transparent"].use_fake_user = True
+            # load_from_library(blend_file, "node_groups", overwrite_data=True)
+            # bpy.data.node_groups["ABS_Transparent"].use_fake_user = True
             # load image textures from 'lib' folder
             import_im_textures(im_names.values(), replace_existing=True)
             # map image nodes to correct image data block

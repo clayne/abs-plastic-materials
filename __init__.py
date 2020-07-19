@@ -29,7 +29,7 @@ bl_info = {
     "category"    : "Materials",
 }
 
-developer_mode = 0  # NOTE: Set to 0 for release, 1 for exposed dictionary
+developer_mode = 1  # NOTE: Set to 0 for release, 1 for exposed dictionary
 # NOTE: Remove beta warning from bl_info
 
 # System imports
@@ -97,6 +97,8 @@ def register():
         "ABS Plastic Trans-Bright Orange",
         "ABS Plastic Trans-Brown",
         "ABS Plastic Trans-Clear",
+        "ABS Plastic Trans-Fluorescent Green",
+        "ABS Plastic Trans-Fluorescent Reddish-Orange",
         "ABS Plastic Trans-Green",
         "ABS Plastic Trans-Light Blue",
         "ABS Plastic Trans-Light Green",
@@ -120,6 +122,7 @@ def register():
         "ABS Plastic Magenta",
         "ABS Plastic Medium Dark Flesh",
         "ABS Plastic Medium Lavender",
+        "ABS Plastic Medium Nougat",
         "ABS Plastic Olive Green",
         "ABS Plastic Silver",
         "ABS Plastic Teal",
