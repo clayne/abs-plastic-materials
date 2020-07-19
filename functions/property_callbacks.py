@@ -119,12 +119,14 @@ def update_abs_displace(self, context):
         waves = target_node.inputs.get("Waves")
         scratches = target_node.inputs.get("Scratches")
         fingerprints = target_node.inputs.get("Fingerprints")
+        concavity = target_node.inputs.get("Concavity")
         if noise is None or waves is None or scratches is None or fingerprints is None:
             continue
         noise.default_value = scn.abs_displace * (20 if mat.name in ("ABS Plastic Gold", "ABS Plastic Silver") else 1)
         waves.default_value = scn.abs_displace
         scratches.default_value = scn.abs_displace
         fingerprints.default_value = scn.abs_fingerprints * scn.abs_displace * 4
+        concavity.default_value = scn.abs_displace
         # disconnect displacement node if not used
         try:
             displace_in = nodes["Material Output"].inputs["Displacement"]

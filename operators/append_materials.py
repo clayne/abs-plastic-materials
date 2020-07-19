@@ -129,10 +129,6 @@ class ABS_OT_append_materials(Operator):
                 n_shader.node_tree = bpy.data.node_groups.get("ABS_Dialectric")
                 n_shader.name = "ABS Dialectric"
                 n_shader.inputs["SSS Default"].hide = True
-            n_normal = nodes.new("ShaderNodeGroup")
-            n_normal.node_tree = bpy.data.node_groups.get("ABS_Concave Walls")
-            n_normal.name = "ABS Concave Walls"
-            n_normal.inputs["Strength"].default_value = 0.075
             n_bump = nodes.new("ShaderNodeGroup")
             n_bump.node_tree = bpy.data.node_groups.get("ABS_Bump")
             n_bump.name = "ABS Bump"
@@ -173,7 +169,6 @@ class ABS_OT_append_materials(Operator):
             links = m.node_tree.links
             links.new(n_shader.outputs["Shader"], n_output.inputs["Surface"])
             n_shader.inputs["Normal"]
-            links.new(n_normal.outputs["Normal"], n_shader.inputs["Normal"])
             if b280():
                 links.new(n_bump.outputs["Color"], n_displace.inputs["Height"])
             #     links.new(n_displace.outputs["Displacement"], n_output.inputs["Displacement"])
@@ -197,7 +192,6 @@ class ABS_OT_append_materials(Operator):
             n_output.location.x += 200
             starting_loc = n_output.location
             n_shader.location = starting_loc - Vector((400, -250))
-            n_normal.location = starting_loc - Vector((600, -50))
             n_bump.location = starting_loc - Vector((400, 150))
             if b280():
                 n_displace.location = starting_loc - Vector((200, 150))
