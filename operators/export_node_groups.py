@@ -51,7 +51,7 @@ class ABS_OT_export_node_groups(Operator):
                     node.image = None
 
         # append node groups from nodeDirectory
-        group_names = ("ABS_Bump", "ABS_Dialectric", "ABS_Transparent", "ABS_Uniform Scale", "ABS_Translate")
+        group_names = ("ABS_Bump", "ABS_Concave Walls", "ABS_Dialectric", "ABS_Transparent", "ABS_Uniform Scale", "ABS_Translate")
         for group_name in group_names:
             data_blocks.append(bpy.data.node_groups.get(group_name))
 

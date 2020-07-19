@@ -18,11 +18,11 @@
 bl_info = {
     "name"        : "ABS Plastic Materials",
     "author"      : "Christopher Gearhart <chris@bblanimation.com>",
-    "version"     : (3, 0, 0),
-    "blender"     : (2, 82, 0),
+    "version"     : (3, 1, 0),
+    "blender"     : (2, 83, 0),
     "description" : "Append ABS Plastic Materials to current blender file with a simple click",
     "location"    : "PROPERTIES > Materials > ABS Plastic Materials",
-    "warning"     : "", #"Untested Beta release – update to official release when available",  # used for warning icon and text in addons panel
+    "warning"     : "Untested Beta release – update to official release when available",  # used for warning icon and text in addons panel
     "wiki_url"    : "https://www.blendermarket.com/products/abs-plastic-materials",
     "doc_url"     : "https://www.blendermarket.com/products/abs-plastic-materials",  # 2.83+
     "tracker_url" : "https://github.com/bblanimation/abs-plastic-materials/issues",
