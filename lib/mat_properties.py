@@ -329,7 +329,7 @@ mat_properties = {
   'ABS Plastic Trans-Fluorescent Green':{
       'Color':[0.858457, 1.0, 0.0, 0.65],
       'Rough 1': 0.001,
-      'Fluorescence':0.35,
+      'Fluorescence':0.8,
       'Fluorescent Color':[0.230947, 1.0, 0.045182, 1.0],
       # Other properties (not node inputs)
       'LDR Code':42,
