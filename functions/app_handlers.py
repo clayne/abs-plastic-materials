@@ -21,6 +21,7 @@
 # Blender imports
 import bpy
 from bpy.app.handlers import persistent
+from .property_callbacks import *
 
 # Module imports
 # NONE!
@@ -35,3 +36,11 @@ def handle_upconversion(scn):
     orange_mat = bpy.data.materials.get('ABS Plastic Trans-Reddish Orange')
     if orange_mat is not None:
         orange_mat.name = 'ABS Plastic Trans-Bright Orange'
+
+@persistent
+def verify_texture_data(scn):
+    mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
+    already_imported = [mn for mn in mat_names if bpy.data.materials.get(mn) is not None]
+    if len(already_imported) > 0:
+        update_fd_image(scn, bpy.context)
+        update_s_image(scn, bpy.context)

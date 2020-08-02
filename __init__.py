@@ -226,6 +226,7 @@ def register():
 
     # register app handlers
     bpy.app.handlers.load_post.append(app_handlers.handle_upconversion)
+    bpy.app.handlers.load_post.append(app_handlers.verify_texture_data)
 
     # addon updater code and configurations
     addon_updater_ops.register(bl_info)
@@ -238,6 +239,7 @@ def unregister():
     addon_updater_ops.unregister()
 
     # unregister app handlers
+    bpy.app.handlers.load_post.remove(app_handlers.verify_texture_data)
     bpy.app.handlers.load_post.remove(app_handlers.handle_upconversion)
 
     del Material.abs_plastic_version

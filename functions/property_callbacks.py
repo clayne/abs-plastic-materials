@@ -191,7 +191,7 @@ def update_texture_mapping(self, context):
 
 
 
-def update_fd_image(self, context):
+def update_fd_image(scn, context):
     import_im_textures(["ABS Fingerprints and Dust.jpg"])
     im = bpy.data.images.get("ABS Fingerprints and Dust.jpg")
     scn = context.scene
@@ -205,7 +205,7 @@ def update_fd_image(self, context):
         img_node.image = resized_img
 
 
-def update_s_image(self, context):
+def update_s_image(scn, context):
     import_im_textures(["ABS Scratches.jpg"])
     im = bpy.data.images.get("ABS Scratches.jpg")
     scn = context.scene
@@ -222,8 +222,12 @@ def get_detail_image(res, full_img):
         return full_img
     new_img_name = "{im_name} ({res}).jpg".format(im_name=full_img.name.replace(".jpg", ""), res=res)
     detail_img_scaled = bpy.data.images.get(new_img_name)
+    if detail_img_scaled and not detail_img_scaled.has_data:
+        bpy.data.images.remove(detail_img_scaled)
+        detail_img_scaled = None
     if detail_img_scaled is None:
         detail_img_scaled = duplicate_image(full_img, new_img_name)
         new_size = Vector(full_img.size) * res
         detail_img_scaled.scale(new_size.x, new_size.y)
+        detail_img_scaled.use_fake_user = True
     return detail_img_scaled
