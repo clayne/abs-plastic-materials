@@ -32,10 +32,10 @@ def handle_upconversion(scn):
     # rename outdated ABS Plastic Material names
     pink_mat = bpy.data.materials.get('ABS Plastic Pink')
     if pink_mat is not None:
-        pink_mat.name = 'ABS Plastic Bright Pink'
+        pink_mat.name = 'ABS Plastic Dark Pink'
     orange_mat = bpy.data.materials.get('ABS Plastic Trans-Reddish Orange')
     if orange_mat is not None:
-        orange_mat.name = 'ABS Plastic Trans-Bright Orange'
+        orange_mat.name = 'ABS Plastic Trans-Orange'
 
 @persistent
 def verify_texture_data(scn):

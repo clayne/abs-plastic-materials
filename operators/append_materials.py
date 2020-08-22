@@ -213,7 +213,7 @@ class ABS_OT_append_materials(Operator):
                     except KeyError:
                         pass
             m.diffuse_color = mat_properties[mat_name]["Color" if mat_name.startswith("ABS Plastic Trans-") else "Diffuse Color"][:4 if b280() else 3]
-            if b280() and m.name in ("ABS Plastic Gold", "ABS Plastic Silver"):
+            if b280() and "Metallic" in m.name:
                 m.diffuse_color[0] = m.diffuse_color[0] * 1.85
                 m.diffuse_color[1] = m.diffuse_color[1] * 1.85
                 m.diffuse_color[2] = m.diffuse_color[2] * 1.85
