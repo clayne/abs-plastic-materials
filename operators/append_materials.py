@@ -35,6 +35,9 @@ class ABS_OT_append_materials(Operator):
     bl_label = "Append ABS Plastic Materials"
     bl_options = {"REGISTER", "UNDO"}
 
+    ################################################
+    # Blender Operator methods
+
     # @classmethod
     # def poll(self, context):
     #     return context.scene.render.engine in ("CYCLES", "BLENDER_EEVEE")
@@ -48,7 +51,7 @@ class ABS_OT_append_materials(Operator):
 
         # initialize variables
         scn = context.scene
-        mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
+        mat_names = get_mat_names(include_undefined=self.include_undefined)  # list of materials to append from 'abs_plastic_materials.blend'
         already_imported = [mn for mn in mat_names if bpy.data.materials.get(mn) is not None]
         self.mats_to_replace = []
         failed = []
@@ -212,7 +215,9 @@ class ABS_OT_append_materials(Operator):
                         n_shader.inputs[k].default_value = mat_properties[mat_name][k]
                     except KeyError:
                         pass
-            m.diffuse_color = mat_properties[mat_name]["Color" if mat_name.startswith("ABS Plastic Trans-") else "Diffuse Color"][:4 if b280() else 3]
+                m.diffuse_color = mat_properties[mat_name]["Color" if mat_name.startswith("ABS Plastic Trans-") else "Diffuse Color"][:4 if b280() else 3]
+            else:
+                raise Exception(f"{mat_name} not in 'mat_properties'")
             if b280() and "Metallic" in m.name:
                 m.diffuse_color[0] = m.diffuse_color[0] * 1.85
                 m.diffuse_color[1] = m.diffuse_color[1] * 1.85
@@ -278,5 +283,17 @@ class ABS_OT_append_materials(Operator):
         self.event = event
         return self.execute(context)
 
+    #############################################
+    # initialization method
+
     def __init__(self):
         self.event = None
+
+    #############################################
+    # class variables
+
+    include_undefined = BoolProperty(
+        default=False,
+    )
+
+    #############################################

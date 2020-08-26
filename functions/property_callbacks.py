@@ -27,11 +27,12 @@ from .common import *
 from .general import *
 
 
-def get_mat_names():
+def get_mat_names(include_undefined=True):
     scn = bpy.context.scene
     materials = bpy.props.abs_mats_common.copy()
     materials += bpy.props.abs_mats_transparent
     materials += bpy.props.abs_mats_uncommon
+    materials += bpy.props.abs_mats_undefined
     return materials
 
 

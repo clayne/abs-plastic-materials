@@ -34,6 +34,9 @@ class ABS_OT_export_node_groups(Operator):
     bl_label = "Export ABS Node Groups"
     bl_options = {"REGISTER", "UNDO"}
 
+    ################################################
+    # Blender Operator methods
+
     @classmethod
     def poll(self, context):
         return bpy.props.abs_developer_mode != 0
@@ -72,3 +75,5 @@ class ABS_OT_export_node_groups(Operator):
                     node.image = backup_ims[node.name]
 
         return {"FINISHED"}
+
+    #############################################

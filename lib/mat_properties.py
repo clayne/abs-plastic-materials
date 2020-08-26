@@ -65,6 +65,14 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':10,
   },
+  'ABS Plastic Bright Light Blue':{
+      # 'Diffuse Color':[0.05951, 0.32314, 0.60383, 1.0],  # OLD
+  #     'Diffuse Color':[0.337164, 0.545725, 0.921582, 1.0], # Possibly better?
+      'Diffuse Color':[0.084, 0.225, 0.656, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':212,
+  },
   'ABS Plastic Bright Light Orange':{
       'Diffuse Color':[0.98225, 0.4452, 0.0, 1.0],
       'Boost Value':0.1,
@@ -72,26 +80,27 @@ mat_properties = {
       'SSS Amount':0.12,
       'SSS Default':0.12,
       # Other properties (not node inputs)
-      'LDR Code':366,
-  },
-  'ABS Plastic Dark Pink':{
-      'Diffuse Color':[0.86316, 0.08228, 0.23455, 1.0],
-      'SSS Color':[0.98225, 0.0, 0.0999, 1.0],
-      'SSS Amount':0.04,
-      'SSS Default':0.04,
-      # Other properties (not node inputs)
-      'LDR Code':5,
-  },
-  'ABS Plastic Reddish Brown':{
-      'Diffuse Color':[0.16513, 0.04817, 0.02416, 1.0],
-      # Other properties (not node inputs)
-      'LDR Code':70,
+      'LDR Code':199,
   },
   'ABS Plastic Bright Light Yellow':{
       'Diffuse Color':[1.0, 0.83077, 0.20508, 1.0],
       # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
       'LDR Code':266,
+  },
+  'ABS Plastic Bright Pink':{
+      'Diffuse Color':[0.92158, 0.40724, 0.7011, 1.0],
+      'SSS Color':[0.98225, 0.01797, 0.15952, 1.0],
+      'SSS Amount':0.04,
+      'SSS Default':0.04,
+      # Other properties (not node inputs)
+      'LDR Code':29,
+  },
+  'ABS Plastic Coral':{
+      'Diffuse Color':[0.991102, 0.152926, 0.181164, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':353,
   },
   'ABS Plastic Dark Azure':{
       'Diffuse Color':[0.16203, 0.40724, 0.65837, 1.0],
@@ -106,6 +115,11 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':272,
   },
+  'ABS Plastic Dark Bluish Gray':{
+      'Diffuse Color':[0.07819, 0.0999, 0.09306, 1.0],
+      # Other properties (not node inputs)
+      'LDR Code':72,  # 8 for classic (but expensive) Dark Bluish Gray
+  },
   'ABS Plastic Dark Brown':{
       'Diffuse Color':[0.06848, 0.0331, 0.02519, 1.0],
       # Other properties (not node inputs)
@@ -119,10 +133,19 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':288,
   },
-  'ABS Plastic Dark Bluish Gray':{
-      'Diffuse Color':[0.07819, 0.0999, 0.09306, 1.0],
+  'ABS Plastic Dark Orange':{
+      'Diffuse Color':[0.278894, 0.078187, 0.011612, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
-      'LDR Code':72,  # 8 for classic (but expensive) Dark Bluish Gray
+      'LDR Code':484,
+  },
+  'ABS Plastic Dark Pink':{
+      'Diffuse Color':[0.2462, 0.02217, 0.14703, 1.0],
+      'SSS Color':[0.87962, 0.0, 0.06848, 1.0],
+      'SSS Amount':0.04,
+      'SSS Default':0.04,
+      # Other properties (not node inputs)
+      'LDR Code':5,
   },
   'ABS Plastic Dark Purple':{
       'Diffuse Color':[0.09306, 0.05127, 0.25818, 1.0],
@@ -146,18 +169,11 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':28,
   },
-  'ABS Plastic Metallic Gold':{
-      'Diffuse Color':[0.38333, 0.2021, 0.05824, 1.0],
-      'Rough 1':0.25,
-      'Rough 2':0.33,
-      'Metallic':0.85,
-      'Speckle':0.35,
-      'Fingerprints':0.03125,
-      'SSS Color':[1.0, 0.16827, 0.0, 1.0],
-      'SSS Amount':0.05,
-      'SSS Default':0.05,
+  'ABS Plastic Dark Turquoise':{
+      'Diffuse Color':[0.0, 0.29177, 0.28315, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
-      'LDR Code':334,
+      'LDR Code':3,
   },
   'ABS Plastic Green':{
       'Diffuse Color':[0.0, 0.21586, 0.04971, 1.0],
@@ -173,11 +189,11 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':31,
   },
-  'ABS Plastic Light Blue':{
-      'Diffuse Color':[0.05951, 0.32314, 0.60383, 1.0],
+  'ABS Plastic Light Aqua':{
+      'Diffuse Color':[0.651406, 0.887923, 0.814847, 1.0],
       # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
-      'LDR Code':9,
+      'LDR Code':323,
   },
   'ABS Plastic Light Nougat':{
       'Diffuse Color':[0.93011, 0.55834, 0.39676, 1.0],
@@ -193,14 +209,6 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':71,
   },
-  'ABS Plastic Bright Pink':{
-      'Diffuse Color':[0.92158, 0.40724, 0.7011, 1.0],
-      'SSS Color':[0.98225, 0.01797, 0.15952, 1.0],
-      'SSS Amount':0.04,
-      'SSS Default':0.04,
-      # Other properties (not node inputs)
-      'LDR Code':29,
-  },
   'ABS Plastic Lime':{
       'Diffuse Color':[0.36625, 0.49102, 0.00304, 1.0],
       'SSS Color':[0.43966, 0.95597, 0.0, 1.0],
@@ -215,6 +223,18 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':26,
   },
+  'ABS Plastic Medium Azure':{
+      'Diffuse Color':[0.138432, 0.53948, 0.752943, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':322,
+  },
+  'ABS Plastic Medium Blue':{
+      'Diffuse Color':[0.168269, 0.304987, 0.577581, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':73,
+  },
   'ABS Plastic Medium Nougat':{
       'Diffuse Color':[0.42327, 0.17465, 0.0648, 1.0],
       # TODO: UPDATE SUBSURFACE SCATTERING COLOR
@@ -226,6 +246,35 @@ mat_properties = {
       # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
       'LDR Code':30,
+  },
+  'ABS Plastic Metallic Gold':{
+      'Diffuse Color':[0.38333, 0.2021, 0.05824, 1.0],
+      'Rough 1':0.25,
+      'Rough 2':0.33,
+      'Metallic':0.85,
+      'Speckle':0.35,
+      'Fingerprints':0.03125,
+      'SSS Color':[1.0, 0.16827, 0.0, 1.0],
+      'SSS Amount':0.05,
+      'SSS Default':0.05,
+      # Other properties (not node inputs)
+      'LDR Code':82,
+  },
+  'ABS Plastic Metallic Silver':{
+      'Diffuse Color':[0.30963, 0.30963, 0.30963, 1.0],
+      'Rough 1':0.25,
+      'Rough 2':0.33,
+      'Metallic':0.9,
+      'Speckle':0.35,
+      'Fingerprints':0.03125,
+      # Other properties (not node inputs)
+      'LDR Code':80,
+  },
+  'ABS Plastic Nougat':{
+      'Diffuse Color':[0.491021, 0.215861, 0.1, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':92,
   },
   'ABS Plastic Olive Green':{
       'Diffuse Color':[0.181164, 0.184475, 0.076185, 1.0],
@@ -243,14 +292,6 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':25,
   },
-  'ABS Plastic Purple':{
-      'Diffuse Color':[0.2462, 0.02217, 0.14703, 1.0],
-      'SSS Color':[0.87962, 0.0, 0.06848, 1.0],
-      'SSS Amount':0.04,
-      'SSS Default':0.04,
-      # Other properties (not node inputs)
-      'LDR Code':5,
-  },
   'ABS Plastic Red':{
       'Diffuse Color':[0.50289, 0.01161, 0.01521, 1.0],
       'SSS Color':[1.0, 0.0, 0.0, 1.0],
@@ -258,6 +299,11 @@ mat_properties = {
       'SSS Default':0.14,
       # Other properties (not node inputs)
       'LDR Code':4,
+  },
+  'ABS Plastic Reddish Brown':{
+      'Diffuse Color':[0.16513, 0.04817, 0.02416, 1.0],
+      # Other properties (not node inputs)
+      'LDR Code':70,
   },
   'ABS Plastic Sand Blue':{
       'Diffuse Color':[0.15593, 0.23455, 0.30054, 1.0],
@@ -275,16 +321,6 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':378,
   },
-  'ABS Plastic Metallic Silver':{
-      'Diffuse Color':[0.30963, 0.30963, 0.30963, 1.0],
-      'Rough 1':0.25,
-      'Rough 2':0.33,
-      'Metallic':0.9,
-      'Speckle':0.35,
-      'Fingerprints':0.03125,
-      # Other properties (not node inputs)
-      'LDR Code':383,
-  },
   'ABS Plastic Tan':{
       'Diffuse Color':[0.71569, 0.53948, 0.30054, 1.0],
       'SSS Color':[1.0, 0.67244, 0.06125, 1.0],
@@ -293,16 +329,10 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':19,
   },
-  'ABS Plastic Dark Turquoise':{
-      'Diffuse Color':[0.0, 0.29177, 0.28315, 1.0],
-      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
-      # Other properties (not node inputs)
-      'LDR Code':3,
-  },
   'ABS Plastic Trans-Dark Blue':{
       'Color':[0.0, 0.42327, 0.7454, 0.75],
       # Other properties (not node inputs)
-      'LDR Code':41,
+      'LDR Code':33,
   },
   'ABS Plastic Trans-Orange':{
       'Color':[1.0, 0.31399, 0.0, 0.75],
@@ -316,10 +346,33 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':40,
   },
+  'ABS Plastic Trans-Bright Green':{
+      'Color':[0.192202, 0.7454, 0.0, 0.75],
+      'Boost Value':0.33,
+      # TODO: UPDATE BASED ON IN-PERSON ANALYSIS
+      # Other properties (not node inputs)
+      'LDR Code':35,
+  },
   'ABS Plastic Trans-Clear':{
       'Color':[1.0, 0.98225, 0.94731, 0.65],
       # Other properties (not node inputs)
       'LDR Code':47,
+  },
+  'ABS Plastic Trans-Dark Pink':{
+      'Color':[0.7454, 0.024093, 0.302096, 1.0],
+      # TODO: UPDATE BASED ON IN-PERSON ANALYSIS
+      # Other properties (not node inputs)
+      'LDR Code':37,
+  },
+  'ABS Plastic Trans-Green':{
+      'Color':[0.0, 0.53328, 0.08438, 0.75],
+      # Other properties (not node inputs)
+      'LDR Code':34,
+  },
+  'ABS Plastic Trans-Light Blue':{
+      'Color':[0.38643, 0.85499, 1.0, 0.75],
+      # Other properties (not node inputs)
+      'LDR Code':43,
   },
   'ABS Plastic Trans-Neon Green':{
       'Color':[0.858457, 1.0, 0.0, 0.65],
@@ -336,25 +389,16 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':38,
   },
-  'ABS Plastic Trans-Green':{
-      'Color':[0.0, 0.53328, 0.08438, 0.75],
-      # Other properties (not node inputs)
-      'LDR Code':34,
-  },
-  'ABS Plastic Trans-Light Blue':{
-      'Color':[0.38643, 0.85499, 1.0, 0.75],
-      # Other properties (not node inputs)
-      'LDR Code':43,
-  },
-  'ABS Plastic Trans-Light Green':{
-      'Color':[0.88792, 1.0, 0.01229, 0.75],
-      # Other properties (not node inputs)
-      'LDR Code':42,
-  },
   'ABS Plastic Trans-Orange':{
       'Color':[1.0, 0.47353, 0.12214, 0.75],
       # Other properties (not node inputs)
       'LDR Code':57,
+  },
+  'ABS Plastic Trans-Purple':{
+      'Color':[0.320953, 0.018755, 0.7454, 1.0],
+      # TODO: UPDATE BASED ON IN-PERSON ANALYSIS
+      # Other properties (not node inputs)
+      'LDR Code':52,
   },
   'ABS Plastic Trans-Red':{
       'Color':[0.95597, 0.0, 0.0, 0.75],
@@ -366,12 +410,12 @@ mat_properties = {
       # Other properties (not node inputs)
       'LDR Code':46,
   },
-  'ABS Plastic Trans-Yellowish Clear':{
-      'Color':[0.87962, 0.8388, 0.73046, 0.7],
-      'Rough 1':0.015,
-      # Other properties (not node inputs)
-      'LDR Code':47,
-  },
+  # 'ABS Plastic Trans-Yellowish Clear':{
+  #     'Color':[0.87962, 0.8388, 0.73046, 0.7],
+  #     'Rough 1':0.015,
+  #     # Other properties (not node inputs)
+  #     'LDR Code':47,
+  # },
   'ABS Plastic White':{
       'Diffuse Color':[0.94731, 0.89627, 0.81485, 1.0],
       'SSS Color':[1.0, 0.67244, 0.06125, 1.0],
@@ -387,5 +431,42 @@ mat_properties = {
       'SSS Default':0.14,
       # Other properties (not node inputs)
       'LDR Code':14,
+  },
+  'ABS Plastic Yellowish Green':{
+      'Diffuse Color':[0.752942, 0.938686, 0.323143, 1.0],
+      # TODO: UPDATE SUBSURFACE SCATTERING COLOR
+      # Other properties (not node inputs)
+      'LDR Code':326,
+  },
+  # TODO: define properties for the following materials
+  'ABS Plastic Pearl Gold':{
+      'Diffuse Color':[0.396755, 0.212231, 0.026241, 1],
+      # Other properties (not node inputs)
+      'LDR Code':297,
+  },
+  'ABS Plastic Flat Silver':{
+      'Diffuse Color':[0.258183, 0.262251, 0.258183, 1],
+      # Other properties (not node inputs)
+      'LDR Code':135,
+  },
+  'ABS Plastic Pearl Dark Gray':{
+      'Diffuse Color':[0.048172, 0.043735, 0.039546, 1],
+      # Other properties (not node inputs)
+      'LDR Code':87, # previously 148
+  },
+  # 'ABS Plastic Copper':{
+  #     'Diffuse Color':[0.7, 0.7, 0.7, 1],
+  #     # Other properties (not node inputs)
+  #     'LDR Code':None,
+  # },
+  'ABS Plastic Chrome Silver':{
+      'Diffuse Color':[0.610496, 0.6172076, 0.610496, 1],
+      # Other properties (not node inputs)
+      'LDR Code':383,
+  },
+  'ABS Plastic Chrome Gold':{
+      'Diffuse Color':[0.730461, 0.527115, 0.177888, 1],
+      # Other properties (not node inputs)
+      'LDR Code':334,
   },
 }

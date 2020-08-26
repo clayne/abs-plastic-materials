@@ -34,6 +34,9 @@ class ABS_OT_mark_outdated(Operator):
     bl_label = "Mark ABS Plastic Materials Outdated"
     bl_options = {"REGISTER", "UNDO"}
 
+    ################################################
+    # Blender Operator methods
+
     # @classmethod
     # def poll(self, context):
     #     # TODO: Speed this up
@@ -53,3 +56,5 @@ class ABS_OT_mark_outdated(Operator):
             m.abs_plastic_version = str(cur_version)[1:-1].replace(", ", ".")
         self.report({"INFO"}, "ABS Plastic Materials were marked as outdated")
         return {"FINISHED"}
+
+    #############################################
