@@ -21,6 +21,7 @@
 # Blender imports
 import bpy
 from bpy.props import *
+from ..lib.mat_properties import mat_properties
 
 # Module imports
 from .common import *
@@ -46,12 +47,10 @@ def update_abs_subsurf(self, context):
         target_node = nodes.get("ABS Dialectric")
         if target_node is None:
             continue
-        input1 = target_node.inputs.get("SSS Default")
-        input2 = target_node.inputs.get("SSS Amount")
-        if input1 is None or input2 is None:
+        sss_input = target_node.inputs.get("SSS Amount")
+        if sss_input is None:
             continue
-        default_amount = input1.default_value
-        input2.default_value = default_amount * scn.abs_subsurf
+        sss_input.default_value = mat_properties[mat_name]["SSS Amount"] * scn.abs_subsurf
 
 
 def update_abs_roughness(self, context):

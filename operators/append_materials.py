@@ -131,7 +131,6 @@ class ABS_OT_append_materials(Operator):
             else:
                 n_shader.node_tree = bpy.data.node_groups.get("ABS_Dialectric")
                 n_shader.name = "ABS Dialectric"
-                n_shader.inputs["SSS Default"].hide = True
             n_bump = nodes.new("ShaderNodeGroup")
             n_bump.node_tree = bpy.data.node_groups.get("ABS_Bump")
             n_bump.name = "ABS Bump"
