@@ -40,7 +40,7 @@ class ABS_OT_append_materials(Operator):
 
     @classmethod
     def poll(self, context):
-		return bpy.props.abs_validated
+        return bpy.props.abs_validated
 
     def execute(self, context):
         # ensure cycles addon is enabled
