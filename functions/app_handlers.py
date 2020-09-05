@@ -67,21 +67,24 @@ def verify_texture_data(scn):
 
 @persistent
 def validate_abs_plastic_materials(dummy):
-    validated = False
-    validation_file = join(get_addon_directory(), "lib", codecs.encode("nof_cynfgvp_chepunfr_irevsvpngvba.gkg", "rot13"))
-    if exists(validation_file):
-        verification_str = "Thank you for supporting my work and ongoing development by purchasing ABS Plastic Materials!\n"
-        with open(validation_file) as f:
-            validated = verification_str == codecs.encode(f.readline(), "rot13")
-    if not validated:
-        res = updater.run_update(
-    		force=False,
+	validated = False
+	print("HERE")
+	validation_file = join(get_addon_directory(), "lib", codecs.encode("nof_cynfgvp_chepunfr_irevsvpngvba.gkg", "rot13"))
+	if exists(validation_file):
+		print(1)
+		verification_str = "Thank you for supporting my work and ongoing development by purchasing ABS Plastic Materials!\n"
+		with open(validation_file) as f:
+			validated = verification_str == codecs.encode(f.readline(), "rot13")
+	if not validated:
+		print(2)
+		res = updater.run_update(
+			force=False,
 			revert_tag="demo",
-    		# callback=post_update_callback,
-    		clean=False,
-        )
-        folderpath, foldername = split(get_addon_directory())
-        bpy.props.abs_validated = False
+			# callback=post_update_callback,
+			clean=False,
+		)
+		folderpath, foldername = split(get_addon_directory())
+		bpy.props.abs_validated = False
 
 
 @persistent
