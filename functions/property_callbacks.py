@@ -33,7 +33,8 @@ def get_mat_names(include_undefined=True):
     materials = bpy.props.abs_mats_common.copy()
     materials += bpy.props.abs_mats_transparent
     materials += bpy.props.abs_mats_uncommon
-    materials += bpy.props.abs_mats_undefined
+    if include_undefined:
+        materials += bpy.props.abs_mats_undefined
     return materials
 
 
