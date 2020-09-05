@@ -62,7 +62,8 @@ def register():
     bpy.props.abs_plastic_materials_module_name = __name__
     bpy.props.abs_plastic_version = str(bl_info["version"])[1:-1].replace(", ", ".")
     bpy.props.abs_mat_properties = mat_properties.mat_properties
-    bpy.props.bricker_developer_mode = getpass.getuser().startswith("cgear") and True
+    bpy.props.abs_developer_mode = getpass.getuser().startswith("cgear") and True
+    bpy.props.abs_validated = True
 
     bpy.props.abs_mats_common = [
         "ABS Plastic Black",
@@ -265,6 +266,7 @@ def unregister():
     del bpy.props.abs_mats_transparent
     del bpy.props.abs_mats_common
     del bpy.props.abs_mat_properties
+    del bpy.props.abs_validated
     del bpy.props.abs_plastic_version
     del bpy.props.abs_plastic_materials_module_name
 

@@ -52,7 +52,7 @@ def validate_abs_plastic_materials(dummy):
     		clean=False,
         )
         folderpath, foldername = split(get_addon_directory())
-        bpy.props.bricker_validated = False
+        bpy.props.abs_validated = False
 
 
 @persistent
