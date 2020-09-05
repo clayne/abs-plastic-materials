@@ -235,7 +235,7 @@ def register():
     Material.abs_plastic_version = StringProperty(default="2.1.0")  # default is the version where this property was introduced
 
     # register app handlers
-    # bpy.app.handlers.load_pre.append(app_handlers.validate_abs_plastic_materials)
+    bpy.app.handlers.load_pre.append(app_handlers.validate_abs_plastic_materials)
     bpy.app.handlers.load_post.append(app_handlers.handle_upconversion)
     bpy.app.handlers.load_post.append(app_handlers.verify_texture_data)
 
@@ -251,7 +251,7 @@ def unregister():
     # unregister app handlers
     bpy.app.handlers.load_post.remove(app_handlers.verify_texture_data)
     bpy.app.handlers.load_post.remove(app_handlers.handle_upconversion)
-    # bpy.app.handlers.load_pre.remove(app_handlers.validate_abs_plastic_materials)
+    bpy.app.handlers.load_pre.remove(app_handlers.validate_abs_plastic_materials)
 
     del Material.abs_plastic_version
     del Scene.abs_viewport_transparency
