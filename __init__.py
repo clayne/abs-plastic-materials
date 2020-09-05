@@ -30,7 +30,7 @@ bl_info = {
 }
 
 # System imports
-# NONE!
+import getpass
 
 # Blender imports
 import bpy

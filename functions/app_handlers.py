@@ -16,7 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # System imports
-# NONE!
+from os.path import join, exists, split
+import codecs
 
 # Blender imports
 import bpy
