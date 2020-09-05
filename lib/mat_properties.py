@@ -80,13 +80,13 @@ mat_properties = {
       'SSS Amount':0.12,
       'SSS Default':0.12,
       # Other properties (not node inputs)
-      'LDR Code':199,
+      'LDR Code':191,
   },
   'ABS Plastic Bright Light Yellow':{
       'Diffuse Color':[1.0, 0.83077, 0.20508, 1.0],
       # TODO: UPDATE SUBSURFACE SCATTERING COLOR
       # Other properties (not node inputs)
-      'LDR Code':266,
+      'LDR Code':226,
   },
   'ABS Plastic Bright Pink':{
       'Diffuse Color':[0.92158, 0.40724, 0.7011, 1.0],

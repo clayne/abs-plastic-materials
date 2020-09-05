@@ -28,6 +28,34 @@ from .property_callbacks import *
 
 
 @persistent
+def verify_texture_data(scn):
+    mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
+    already_imported = [mn for mn in mat_names if bpy.data.materials.get(mn) is not None]
+    if len(already_imported) > 0:
+        update_fd_image(scn, bpy.context)
+        update_s_image(scn, bpy.context)
+
+
+@persistent
+def validate_abs_plastic_materials(dummy):
+    validated = False
+    validation_file = join(get_addon_directory(), "lib", codecs.encode("nof_cynfgvp_chepunfr_irevsvpngvba.gkg", "rot13"))
+    if exists(validation_file):
+        verification_str = "Thank you for supporting my work and ongoing development by purchasing ABS Plastic Materials!\n"
+        with open(validation_file) as f:
+            validated = verification_str == codecs.encode(f.readline(), "rot13")
+    if not validated:
+        res = updater.run_update(
+    		force=False,
+			revert_tag="demo",
+    		# callback=post_update_callback,
+    		clean=False,
+        )
+        folderpath, foldername = split(get_addon_directory())
+        bpy.props.bricker_validated = False
+
+
+@persistent
 def handle_upconversion(scn):
     # rename outdated ABS Plastic Material names
     pink_mat = bpy.data.materials.get('ABS Plastic Pink')
@@ -36,11 +64,3 @@ def handle_upconversion(scn):
     orange_mat = bpy.data.materials.get('ABS Plastic Trans-Reddish Orange')
     if orange_mat is not None:
         orange_mat.name = 'ABS Plastic Trans-Orange'
-
-@persistent
-def verify_texture_data(scn):
-    mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
-    already_imported = [mn for mn in mat_names if bpy.data.materials.get(mn) is not None]
-    if len(already_imported) > 0:
-        update_fd_image(scn, bpy.context)
-        update_s_image(scn, bpy.context)

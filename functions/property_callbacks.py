@@ -203,6 +203,8 @@ def update_fd_image(scn, context):
     image_node1 = fnode.nodes.get("ABS Fingerprints and Dust")
     image_node2 = snode.nodes.get("ABS Fingerprints and Dust")
     for img_node in (image_node1, image_node2):
+        if img_node is None:
+            continue
         img_node.image = resized_img
 
 
@@ -213,8 +215,12 @@ def update_s_image(scn, context):
     res = round(scn.abs_s_quality, 1)
     resized_img = get_detail_image(res, im)
     fnode = bpy.data.node_groups.get("ABS_Scratches")
-    im_node = fnode.nodes.get("ABS Scratches")
-    im_node.image = resized_img
+    if fnode is None:
+        return
+    img_node = fnode.nodes.get("ABS Scratches")
+    if img_node is None:
+        return
+    img_node.image = resized_img
 
 
 def get_detail_image(res, full_img):

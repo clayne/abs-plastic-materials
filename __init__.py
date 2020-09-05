@@ -29,9 +29,6 @@ bl_info = {
     "category"    : "Materials",
 }
 
-developer_mode = 1  # NOTE: Set to 0 for release, 1 for exposed dictionary
-# NOTE: Remove beta warning from bl_info
-
 # System imports
 # NONE!
 
@@ -46,27 +43,26 @@ props = bpy.props
 if "classes_to_register" in locals():
     import importlib
     addon_updater_ops = importlib.reload(addon_updater_ops)
-    make_annotations = importlib.reload(make_annotations)
     app_handlers = importlib.reload(app_handlers)
     property_callbacks = importlib.reload(property_callbacks)
+    common = importlib.reload(common)
     classes_to_register = importlib.reload(classes_to_register)
     mat_properties = importlib.reload(mat_properties)
 else:
     from . import addon_updater_ops
-    from .functions import make_annotations, app_handlers, property_callbacks
-    from .lib import classes_to_register
-    from .lib.mat_properties import mat_properties
+    from .functions import app_handlers, property_callbacks, common
+    from .lib import classes_to_register, mat_properties
 
 
 def register():
     for cls in classes_to_register.classes:
-        make_annotations(cls)
+        common.blender.make_annotations(cls)
         bpy.utils.register_class(cls)
 
     bpy.props.abs_plastic_materials_module_name = __name__
     bpy.props.abs_plastic_version = str(bl_info["version"])[1:-1].replace(", ", ".")
-    bpy.props.abs_mat_properties = mat_properties
-    bpy.props.abs_developer_mode = developer_mode
+    bpy.props.abs_mat_properties = mat_properties.mat_properties
+    bpy.props.bricker_developer_mode = getpass.getuser().startswith("cgear") and True
 
     bpy.props.abs_mats_common = [
         "ABS Plastic Black",
@@ -235,9 +231,10 @@ def register():
     )
 
     # Attribute for tracking version
-    Material.abs_plastic_version = StringProperty(default="2.1.0")
+    Material.abs_plastic_version = StringProperty(default="2.1.0")  # default is the version where this property was introduced
 
     # register app handlers
+    # bpy.app.handlers.load_pre.append(app_handlers.validate_abs_plastic_materials)
     bpy.app.handlers.load_post.append(app_handlers.handle_upconversion)
     bpy.app.handlers.load_post.append(app_handlers.verify_texture_data)
 
@@ -246,7 +243,6 @@ def register():
 
 
 def unregister():
-    Scn = bpy.types.Scene
 
     # addon updater unregister
     addon_updater_ops.unregister()
@@ -254,6 +250,7 @@ def unregister():
     # unregister app handlers
     bpy.app.handlers.load_post.remove(app_handlers.verify_texture_data)
     bpy.app.handlers.load_post.remove(app_handlers.handle_upconversion)
+    # bpy.app.handlers.load_pre.remove(app_handlers.validate_abs_plastic_materials)
 
     del Material.abs_plastic_version
     del Scene.abs_viewport_transparency
