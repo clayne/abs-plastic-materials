@@ -38,9 +38,9 @@ class ABS_OT_append_materials(Operator):
     ################################################
     # Blender Operator methods
 
-    # @classmethod
-    # def poll(self, context):
-    #     return context.scene.render.engine in ("CYCLES", "BLENDER_EEVEE")
+    @classmethod
+    def poll(self, context):
+		return bpy.props.abs_validated
 
     def execute(self, context):
         # ensure cycles addon is enabled
