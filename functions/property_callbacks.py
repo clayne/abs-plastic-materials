@@ -50,7 +50,8 @@ def update_abs_subsurf(self, context):
         sss_input = target_node.inputs.get("SSS Amount")
         if sss_input is None:
             continue
-        sss_input.default_value = mat_properties[mat_name]["SSS Amount"] * scn.abs_subsurf
+        sss_default = mat_properties[mat_name]["SSS Amount"] if "SSS Amount" in mat_properties[mat_name] else 0
+        sss_input.default_value = sss_default * scn.abs_subsurf
 
 
 def update_abs_roughness(self, context):
