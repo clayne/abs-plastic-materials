@@ -57,12 +57,12 @@ except Exception as e:
 
 
 @persistent
-def verify_texture_data(scn):
+def verify_texture_data(dummy):
     mat_names = get_mat_names()  # list of materials to append from 'abs_plastic_materials.blend'
     already_imported = [mn for mn in mat_names if bpy.data.materials.get(mn) is not None]
     if len(already_imported) > 0:
-        update_fd_image(scn, bpy.context)
-        update_s_image(scn, bpy.context)
+        update_fd_image(bpy.context.scene, bpy.context)
+        update_s_image(bpy.context.scene, bpy.context)
 
 
 @persistent

@@ -28,8 +28,10 @@ from .common import *
 
 def import_im_textures(im_names=["ABS Fingerprints and Dust.jpg", "ABS Scratches.jpg"], replace_existing=False):
     im_path = os.path.join(get_addon_directory(), "lib")
+    print(bpy.data.images.keys())
     for im_name in im_names:
         im = bpy.data.images.get(im_name)
+        print(im)
         preexisting_im = im is not None
         # if image texture already exists
         if preexisting_im:

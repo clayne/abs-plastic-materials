@@ -194,10 +194,15 @@ def update_texture_mapping(self, context):
 
 
 def update_fd_image(scn, context):
+    if scn is None:
+        return
+    # check if resized fd image already exists
+    res = round(scn.abs_fpd_quality, 1)
+    if bpy.data.images.get("ABS Fingerprints and Dust ({}).jpg".format(res)):
+        return
+    # get the resized fd image
     import_im_textures(["ABS Fingerprints and Dust.jpg"])
     im = bpy.data.images.get("ABS Fingerprints and Dust.jpg")
-    scn = context.scene
-    res = round(scn.abs_fpd_quality, 1)
     resized_img = get_detail_image(res, im)
     fnode = bpy.data.node_groups.get("ABS_Fingerprint")
     snode = bpy.data.node_groups.get("ABS_Specular Map")
@@ -210,10 +215,15 @@ def update_fd_image(scn, context):
 
 
 def update_s_image(scn, context):
+    if scn is None:
+        return
+    # check if resized s image already exists
+    res = round(scn.abs_s_quality, 1)
+    if bpy.data.images.get("ABS Scratches ({}).jpg".format(res)):
+        return
+    # get the resized s image
     import_im_textures(["ABS Scratches.jpg"])
     im = bpy.data.images.get("ABS Scratches.jpg")
-    scn = context.scene
-    res = round(scn.abs_s_quality, 1)
     resized_img = get_detail_image(res, im)
     fnode = bpy.data.node_groups.get("ABS_Scratches")
     if fnode is None:
